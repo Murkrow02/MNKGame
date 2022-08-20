@@ -6,6 +6,7 @@ import javax.swing.text.html.MinimalHTMLWriter;
 
 import mnkgame.MNKBoard;
 import mnkgame.MNKCell;
+import mnkgame.MNKGameState;
 import mnkgame.MiniMaxMove;
 
 /**
@@ -17,6 +18,8 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	private MNKBoard B;
 	private MNKGameState myWin;
 	private MNKGameState yourWin;
+
+	private Integer EvalMaxValue;
 
 	/**
    * Default empty constructor
@@ -37,83 +40,68 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
 		
 
-		MiniMaxMove result = miniMax(null, true);
+		MiniMaxMove result = miniMax(0, null, true);
 		
 		return result.Cell;
 	}
 
 	//IDEA: at the beginning implement a normal minimax algorithm with 1 win 0 lose, next
 	// try to use more values such as 0.5 if the move is making 2/3 marks lined up and player is going to win (opposite for adversary)
-    public MiniMaxMove miniMax(MNKCell lastCellSelected, boolean maximizingPlayer){
+    public Integer miniMax(int depth, boolean maximizingPlayer){
 
-		//Detect gameover
-		if(B.gameState() == myWin)
-		{
-			B.unmarkCell();
-			return new MiniMaxMove(1, lastCellSelected);
-		}
-		else if(B.gameState() == yourWin)
-		{
-			B.unmarkCell();
-			return new MiniMaxMove(-1, lastCellSelected);
-		}
+		//Static evaluation of current game board
+		Integer CurrentEval = evaluateBoard();
 
+		//Base case, user won, lost or draw
+		if(B.gameState() != MNKGameState.OPEN)
+			return CurrentEval;
+
+		//Our turn (Maximizing)
 		if(maximizingPlayer){
 
-			//Relax technique
-			MiniMaxMove MaxEval = new MiniMaxMove(Integer.MIN_VALUE, null);
+			//Relax technique, assume the worst case scenario and relax on each step
+			Integer MaxValue = Integer.MIN_VALUE;
 
-			int rollback = 0;
-			for(int i = 0; i < B.getFreeCells().length; i++){
+			//Cycle through all possible moves
+			for(int i = 0; i < B.getFreeCells().length; ++i){
 
-				rollback++;
-				
-				//Mark free cell
-				MNKCell Marked = B.getFreeCells()[i];
-				B.markCell(Marked.i, Marked.j);
+				//Mark this cell as player move
+				MNKCell CurrentMove = B.getFreeCells()[i];
+				B.markCell(CurrentMove.i, CurrentMove.j);
 
-				//Eval free cell value
-				MiniMaxMove CurrentEval = miniMax(Marked, false);
+				//Recursively call minmax on this board scenario
+				MaxValue = Math.max(MaxValue, miniMax(depth+1, false));
 
-				//Choose between now evaluated value and maximum evaluated value
-				MaxEval = MaxEval.MoveValue > CurrentEval.MoveValue ? MaxEval : CurrentEval;
-			}
-
-			//Rollback
-			for(int i = 0; i< rollback;i++){
+				//Undo the move
 				B.unmarkCell();
 			}
 
-			return MaxEval;
-		}else{
-
-			//Relax technique
-			MiniMaxMove MinEval = new MiniMaxMove(Integer.MAX_VALUE, null);
-
-			int rollback = 0;
-			for(int i = 0; i < B.getFreeCells().length; i++){
-				
-				rollback++;
-				
-				//Mark free cell
-				MNKCell Marked = B.getFreeCells()[i];
-				B.markCell(Marked.i, Marked.j);
-
-				//Eval free cell value
-				MiniMaxMove CurrentEval = miniMax(Marked, true);
-
-				//Choose between now evaluated value and maximum evaluated value
-				MinEval = MinEval.MoveValue < CurrentEval.MoveValue ? MinEval : CurrentEval;
-			}
-
-			//Rollback
-			for(int i = 0; i< rollback;i++){
-				B.unmarkCell();
-			}
-
-			return MinEval;
-
+			//Return the best value obtained
+			return MaxValue;
 		}
+		//Opponent turn (minimizing)
+		else{
+
+			//Relax technique, assume the worst case scenario and relax on each step
+			Integer MinValue = Integer.MAX_VALUE;
+
+			//Cycle through all possible moves
+			for(int i = 0; i < B.getFreeCells().length; ++i){
+
+				//Mark this cell as player move
+				MNKCell CurrentMove = B.getFreeCells()[i];
+				B.markCell(CurrentMove.i, CurrentMove.j);
+
+				//Recursively call minmax on this board scenario
+				MinValue = Math.min(MinValue, miniMax(depth+1, true));
+
+				//Undo the move
+				B.unmarkCell();
+			}
+
+			return MinValue;
+		}
+
 
     }
 
