@@ -169,7 +169,7 @@ public class MNKGame extends JFrame {
 					if(B.cellState(c.i,c.j) == MNKCellState.FREE) {
 						B.markCell(c.i,c.j);
 					} else {
-						System.err.println(ComPlayer[curr].playerName() + "  selected an illegal move!");
+						System.err.println(ComPlayer[curr].playerName() + "  selected an illegal move!" + c.i + " " + +c.j);
 						System.exit(1);
        		}
 				}
