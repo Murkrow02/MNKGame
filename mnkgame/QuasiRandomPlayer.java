@@ -62,6 +62,7 @@ public class QuasiRandomPlayer implements MNKPlayer {
 	 * </p>
    */
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
+		
 		long start = System.currentTimeMillis();
 		if(MC.length > 0) {
 			MNKCell c = MC[MC.length-1]; // Recover the last move from MC
