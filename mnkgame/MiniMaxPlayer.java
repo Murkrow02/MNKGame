@@ -1,10 +1,11 @@
 /*
- * TODO: PRIMA MOSSA PIAZZZA TIPO AL CENTRO
+ * TODO: MAX_DEPTH in base a dimensioni area di gioco
  * 
  */
 
 package mnkgame;
 
+import java.util.HashSet;
 import java.util.Random;
 
 import javax.crypto.spec.DHPrivateKeySpec;
@@ -21,12 +22,15 @@ import mnkgame.MiniMaxMove;
 public class MiniMaxPlayer  implements MNKPlayer {
 
 	private int TIMEOUT;
-	private static int MAX_DEPTH = 90;
+	public int MAX_DEPTH = 5;
 	private static int MAX_VALUE = 10;
 	private MNKBoard B;
 	private MNKGameState myWin;
 	private MNKGameState yourWin;
 	private boolean meFirst;
+
+	//Zobrist table of previous game positions
+	private long ZobristTable[][][];
 
 	/**
    * Default empty constructor
@@ -42,6 +46,9 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		meFirst = first;
 		TIMEOUT = timeout_in_secs;	
 
+		//Initialize Zobrist
+		ZobristTable = new long[M][N][K];
+		initZobristTable();
 	}
 
 	long start = 0;
@@ -49,6 +56,9 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 		//Start timer
 		start = System.currentTimeMillis();
+
+		//Set max depth based on how many free cell we have
+		MAX_DEPTH = 25-FC.length;
 
 		//Update local board
 		if(MC.length > 0) {
@@ -150,6 +160,8 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 		//Base case, evaluation detected gameover or depth limit reached
 		if(B.gameState() != MNKGameState.OPEN || depth == 0){
+			//if(depth == 0)
+			//	System.err.println("Depth reached 0");
 			return StaticEvaluation;
 		}
 
@@ -305,16 +317,57 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	}
 
 	public boolean isTimeExpiring(){
-		return (System.currentTimeMillis()-start)/1000.0 > TIMEOUT*(99.0/100.0);
+		boolean Expiring = (System.currentTimeMillis()-start)/1000.0 > TIMEOUT*(99.0/100.0);
+		//if(Expiring)
+		// 	System.err.println("Timeout");
+		return Expiring;
 	}
 
 	public void printGameState(){
 		for (int i = 0; i < B.M; i++) { // Print gameboard
 			for (int j = 0; j < B.N; j++) {
-				System.err.println(i + " " + j + ": " + B.B[i][j].toString());
+				System.out.println(i + " " + j + ": " + B.B[i][j].toString());
 			}
 		}
 	}
+
+	//Initialize the Zobrist table with random values
+	public void initZobristTable() {
+		for (int i = 0; i < B.M; ++i) {
+			for (int j = 0; j < B.N; ++j) {
+				for (int k = 0; k < B.K; ++k) {
+					ZobristTable[i][j][k] = new Random().nextLong();
+					System.out.println(ZobristTable[i][j][k] + "\n");
+				}
+			}
+		}
+	}
+
+	public long computeHash()
+	{
+		long hash = 0;
+
+		for (int i = 0; i < B.M; ++i) {
+			for (int j = 0; j < B.N; ++j) {
+				for (int k = 0; k < B.K; ++k) {
+					ZobristTable[i][j][k] = new Random().nextLong();
+					System.out.println(ZobristTable[i][j][k] + "\n");
+				}
+			}
+		}
+		
+		for (int i = 0; i<8; i++)
+		{
+			for (int j = 0; j<8; j++)
+			{
+				if (board[i][j]!='-')
+				{
+					int piece = indexOf(board[i][j]);
+					h ^= ZobristTable[i][j][piece];
+				}
+			}
+		}
+		r
 
 	public String playerName() {
 		return "Mettaton NEO";
