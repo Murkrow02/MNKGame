@@ -1,3 +1,8 @@
+/*
+ * TODO: PRIMA MOSSA PIAZZZA TIPO AL CENTRO
+ * 
+ */
+
 package mnkgame;
 
 import java.util.Random;
@@ -16,12 +21,12 @@ import mnkgame.MiniMaxMove;
 public class MiniMaxPlayer  implements MNKPlayer {
 
 	private int TIMEOUT;
-	private static int MAX_DEPTH = 6;
+	private static int MAX_DEPTH = 90;
 	private static int MAX_VALUE = 10;
 	private MNKBoard B;
 	private MNKGameState myWin;
 	private MNKGameState yourWin;
-	private bool meFirst;
+	private boolean meFirst;
 
 	/**
    * Default empty constructor
@@ -39,9 +44,12 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 	}
 
-	
+	long start = 0;
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
-		
+
+		//Start timer
+		start = System.currentTimeMillis();
+
 		//Update local board
 		if(MC.length > 0) {
 			MNKCell c = MC[MC.length-1]; // Recover move from opponent
@@ -55,6 +63,13 @@ public class MiniMaxPlayer  implements MNKPlayer {
 			return FC[0];
 		}
 
+		//Select center cell as first move
+		if(MC.length == 0){
+			MNKCell MiddleCell = new MNKCell(B.M/2, B.N/2);
+			B.markCell(MiddleCell.i, MiddleCell.j);
+			return MiddleCell;
+		}
+
 		//Use the first available cell if something goes wrong
 		MNKCell BestMove = FC[0]; 
 
@@ -63,16 +78,46 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 		//DEBUG
 		System.out.println("\n ####################################### \n");
-		for(int i = 0; i < B.M; i++){ 		//Print gameboard
-			for(int j = 0; j<B.N; j++){
-				System.err.println(B.B[i][j].toString());
+
+		//If found the best move possible (immediate win) return immediately
+		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-1))){
+
+			System.err.println("START SEARCH FOR WIN");
+
+			//Check if immediate win is possible
+			MNKCell ImmediateWinCell = checkImmediateWin();
+
+			//Exit the loop if found way not to lose
+			if(ImmediateWinCell != null){
+				System.err.println("FOUND IMMEDIATE WIN");
+				B.markCell(ImmediateWinCell.i, ImmediateWinCell.j); //Update local board with this move
+				return ImmediateWinCell;
 			}
 		}
 
+		//Return immediately by intercepting player2 winning move before he does
+		//Check if there are already enough symbols placed for player2 to reach victory
+		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-3))){
+
+			System.err.println("START SEARCH FOR LOSS");
+
+			//Check if immediate loss is possible
+			MNKCell PreventLossCell = checkImmediateLoss();
+
+			//Exit the loop if found way not to lose
+			if(PreventLossCell != null){
+				System.err.println("FOUND IMMEDIATE LOSS");
+				B.markCell(PreventLossCell.i, PreventLossCell.j); //Update local board with this move
+				return PreventLossCell;
+			}
+		}
+		
+
+		//CANNOT IMMEDIATELY LOSE OR WIN, PROCEED WITH MINIMAX
+
 		//Cycle through all possible cells
-		bool alreadyCheckedImmediateLoss = false;
 		for(MNKCell d : FC) {
-			
+
 			//Mark this cell as player move (temp)
 			B.markCell(d.i, d.j);
 
@@ -84,28 +129,6 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 			//Rollback
 			B.unmarkCell();
-
-			//If found the best move possible (immediate win) return immediately
-			if(MoveVal == MAX_VALUE + MAX_DEPTH)
-			{
-				BestMove = d;
-				break; //Exit the loop
-			}else if(!alreadyCheckedImmediateLoss){
-
-				//If player2 is able to win (there are already enough symbols placed for him to reach vicory) intercept his winning move before he does
-				if((meFirst && MC.length >= (B.K*2-1)) || (!meFirst && MC.length >= (B.k*2-2))){
-
-					//Check if 
-					MNKCell PreventLossCell = checkImmediateLoss();
-					alreadyCheckedImmediateLoss = true;
-
-					//Exit the loop if found way not to lose
-					if(PreventLossCell != null){
-						BestMove = PreventLossCell;
-						break;
-					}
-				}
-			}
 
 			//Check if found a better move
 			if(MoveVal > MaxMoveValue){
@@ -151,7 +174,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 				//Prune if better result was available before, no need to continue searching
 				alpha = Math.max(alpha, MaxValue);
-				if (alpha >= beta) {
+				if (alpha >= beta || isTimeExpiring()) {
 					return MaxValue;
 				}
 			}
@@ -180,7 +203,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 				//Prune if better result was available before, no need to continue searching
 				beta = Math.max(beta, MinValue);
-				if (beta <= alpha) {
+				if (beta <= alpha || isTimeExpiring()) {
 					return MinValue;
 				}
 			}
@@ -210,12 +233,88 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	public MNKCell checkImmediateLoss(){
 
 		MNKCell FC[] = B.getFreeCells();
-		for(MNKCell current : FC) {
-		
+
+
+		//In our turn let's select 2 free cells (in case the one randomly selected by us is already the one leading opponent to win)
+		//On each of the two cells selected play any other move by the opponent and see if his move lead him to victory
+		//If only one move leads him to victory return that cell
+		//We can assume that there are at least 2 free cells because if there was only one this method couldn't be called
+		//The cost of the operation is not high: O(2*M*N) (actually lower because some cells are already selected)
+		for(int i = 0; i <2; i++){
+
+			//Select first available cell
+			B.markCell(FC[i].i, FC[i].j);
+			int WinningCellsCount = 0; //Increment on each move that does not end in a lost match
+			MNKCell WinningCellForP2 = null;
+			MNKCell FC2[] = B.getFreeCells();
+			for(MNKCell current : FC2) {
+
+				//No need to continue searching, there are more than 1 cell leading P2 not to win
+				if(WinningCellsCount > 1)
+					break;
+
+				//Mark this cell as our move
+				MNKGameState GameState = B.markCell(current.i, current.j);
+
+				//Detect move outcome
+				if(GameState == yourWin)
+				{
+					System.err.println("P2 wins with " + current.i + " " + current.j);
+					WinningCellForP2 = current; //By selecting this cell P2 does win
+					WinningCellsCount++;
+				}
+
+				//Unselect
+				B.unmarkCell();
+			}
+
+			//Unselect cell selected from us
+			B.unmarkCell();
+
+			//Maybe we found a cell that leads him to victory
+			if(WinningCellsCount == 1 && WinningCellForP2 != null)
+				return WinningCellForP2;
+
+			//Reset and try again
+			WinningCellsCount = 0;
 		}
 
+		//We did not find a winning cell for P2
+		return null;
 	}
 
+	//Return the only cell to select to immediately win
+	public MNKCell checkImmediateWin(){
+
+		MNKCell FC[] = B.getFreeCells();
+
+		for(MNKCell current : FC) {
+
+			//Mark this cell as our move
+			MNKGameState GameState = B.markCell(current.i, current.j);
+
+			B.unmarkCell();
+
+			//Found immediate win
+			if(GameState == myWin)
+				return current;
+		}
+
+		//If we reached this far we can't win this turn
+		return null;
+	}
+
+	public boolean isTimeExpiring(){
+		return (System.currentTimeMillis()-start)/1000.0 > TIMEOUT*(99.0/100.0);
+	}
+
+	public void printGameState(){
+		for (int i = 0; i < B.M; i++) { // Print gameboard
+			for (int j = 0; j < B.N; j++) {
+				System.err.println(i + " " + j + ": " + B.B[i][j].toString());
+			}
+		}
+	}
 
 	public String playerName() {
 		return "Mettaton NEO";
