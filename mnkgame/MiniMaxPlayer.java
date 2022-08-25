@@ -47,7 +47,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		TIMEOUT = timeout_in_secs;	
 
 		//Initialize Zobrist
-		ZobristTable = new long[M][N][K];
+		ZobristTable = new long[M][N][2];
 		initZobristTable();
 	}
 
@@ -343,31 +343,21 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		}
 	}
 
-	public long computeHash()
+	private long opponentTurnHash = 81293; //Random number
+	public long computeHash(boolean opponentTurn)
 	{
 		long hash = 0;
 
-		for (int i = 0; i < B.M; ++i) {
-			for (int j = 0; j < B.N; ++j) {
-				for (int k = 0; k < B.K; ++k) {
-					ZobristTable[i][j][k] = new Random().nextLong();
-					System.out.println(ZobristTable[i][j][k] + "\n");
-				}
-			}
+		//Hash differently based on whom turn it is
+		if(opponentTurn)
+			hash ^= opponentTurnHash;
+
+		//Hash based on current table situation
+		MNKCell MC[] = B.getMarkedCells();
+		for(MNKCell current : MC) {
+			hash ^= ZobristTable[current.i][current.j][current.hashCode()];//Bitwise XOR
 		}
 		
-		for (int i = 0; i<8; i++)
-		{
-			for (int j = 0; j<8; j++)
-			{
-				if (board[i][j]!='-')
-				{
-					int piece = indexOf(board[i][j]);
-					h ^= ZobristTable[i][j][piece];
-				}
-			}
-		}
-		r
 
 	public String playerName() {
 		return "Mettaton NEO";
