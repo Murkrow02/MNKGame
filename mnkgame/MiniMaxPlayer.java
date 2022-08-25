@@ -1,20 +1,19 @@
 /*
- * TODO: MAX_DEPTH in base a dimensioni area di gioco
+ * TODO: 
  * 
  */
 
 package mnkgame;
 
-import java.util.HashSet;
 import java.util.Random;
 
 import javax.crypto.spec.DHPrivateKeySpec;
-import javax.swing.text.html.MinimalHTMLWriter;
 
 import mnkgame.MNKBoard;
 import mnkgame.MNKCell;
 import mnkgame.MNKGameState;
 import mnkgame.MiniMaxMove;
+import mnkgame.ZobristTable;
 
 /**
  * Totally random software player.
@@ -29,8 +28,8 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	private MNKGameState yourWin;
 	private boolean meFirst;
 
-	//Zobrist table of previous game positions
-	private long ZobristTable[][][];
+	//Zobrist table to store gamestate hash
+	public ZobristTable ZT;
 
 	/**
    * Default empty constructor
@@ -46,13 +45,21 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		meFirst = first;
 		TIMEOUT = timeout_in_secs;	
 
-		//Initialize Zobrist
-		ZobristTable = new long[M][N][2];
-		initZobristTable();
+		//Initialize Zobrist table
+		ZT = new ZobristTable(M,N);
 	}
 
 	long start = 0;
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
+
+		//TEST ZOBRIST
+		for(MNKCell d : FC) {
+			System.out.println("\nOld: " + ZT.computeHash(false, B));
+			B.markCell(d.i, d.j);
+			System.out.println("New: " + ZT.computeHash(false, B));
+			B.unmarkCell();
+			System.out.println("Revert: " + ZT.computeHash(false, B));
+		}
 
 		//Start timer
 		start = System.currentTimeMillis();
@@ -246,7 +253,6 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 		MNKCell FC[] = B.getFreeCells();
 
-
 		//In our turn let's select 2 free cells (in case the one randomly selected by us is already the one leading opponent to win)
 		//On each of the two cells selected play any other move by the opponent and see if his move lead him to victory
 		//If only one move leads him to victory return that cell
@@ -331,33 +337,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		}
 	}
 
-	//Initialize the Zobrist table with random values
-	public void initZobristTable() {
-		for (int i = 0; i < B.M; ++i) {
-			for (int j = 0; j < B.N; ++j) {
-				for (int k = 0; k < B.K; ++k) {
-					ZobristTable[i][j][k] = new Random().nextLong();
-					System.out.println(ZobristTable[i][j][k] + "\n");
-				}
-			}
-		}
-	}
-
-	private long opponentTurnHash = 81293; //Random number
-	public long computeHash(boolean opponentTurn)
-	{
-		long hash = 0;
-
-		//Hash differently based on whom turn it is
-		if(opponentTurn)
-			hash ^= opponentTurnHash;
-
-		//Hash based on current table situation
-		MNKCell MC[] = B.getMarkedCells();
-		for(MNKCell current : MC) {
-			hash ^= ZobristTable[current.i][current.j][current.hashCode()];//Bitwise XOR
-		}
-		
+	
 
 	public String playerName() {
 		return "Mettaton NEO";
