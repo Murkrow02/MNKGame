@@ -26,14 +26,14 @@ public class ZobristTable {
         }
     }
 
-    private static long opponentTurnHash = 81293; // Random number
-    public long computeHash(boolean opponentTurn, MNKBoard B) {
+    //private static long opponentTurnHash = 81293; // Random number
+    public long computeHash(MNKBoard B) {
 
         long hash = 0;
 
-        // Hash differently based on whom turn it is
-        if (opponentTurn)
-            hash ^= opponentTurnHash;
+        // Hash differently based on whom turn it is (not needed)
+        //if (opponentTurn)
+        //    hash ^= opponentTurnHash;
 
         // Hash based on current table situation
         MNKCell MC[] = B.getMarkedCells();

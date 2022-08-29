@@ -1,10 +1,12 @@
 /*
- * TODO: 
+ * TODO: Insert all possible win/loss already in hash table
  * 
  */
 
 package mnkgame;
 
+import java.math.BigInteger;
+import java.util.Hashtable;
 import java.util.Random;
 
 import javax.crypto.spec.DHPrivateKeySpec;
@@ -14,6 +16,7 @@ import mnkgame.MNKCell;
 import mnkgame.MNKGameState;
 import mnkgame.MiniMaxMove;
 import mnkgame.ZobristTable;
+import mnkgame.Utility;
 
 /**
  * Totally random software player.
@@ -22,14 +25,22 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 	private int TIMEOUT;
 	public int MAX_DEPTH = 5;
-	private static int MAX_VALUE = 10;
+	private static final int MAX_VALUE = 10;
 	private MNKBoard B;
 	private MNKGameState myWin;
 	private MNKGameState yourWin;
 	private boolean meFirst;
 
-	//Zobrist table to store gamestate hash
+	/* This tri-dimensional array stores M*N random values, is used 
+	   by the game board hashing function to create a unique hash of 
+	   each possible game state
+	*/
 	public ZobristTable ZT;
+
+	/* Insert and access quickly (O(1)) to already evaluated game states
+	 * uniquely identified by Zobrist Hash function
+	 */
+	public Hashtable<Long, Integer> EvaluatedStates;
 
 	/**
    * Default empty constructor
@@ -47,19 +58,14 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 		//Initialize Zobrist table
 		ZT = new ZobristTable(M,N);
+
+		//Initialize hash table 
+		BigInteger AllPossibleBoardStates = Utility.bigFactorial(M*N);
+		EvaluatedStates = new Hashtable<Long, Integer>(M*N); //Default initial capacity
 	}
 
 	long start = 0;
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
-
-		//TEST ZOBRIST
-		for(MNKCell d : FC) {
-			System.out.println("\nOld: " + ZT.computeHash(false, B));
-			B.markCell(d.i, d.j);
-			System.out.println("New: " + ZT.computeHash(false, B));
-			B.unmarkCell();
-			System.out.println("Revert: " + ZT.computeHash(false, B));
-		}
 
 		//Start timer
 		start = System.currentTimeMillis();
@@ -80,13 +86,6 @@ public class MiniMaxPlayer  implements MNKPlayer {
 			return FC[0];
 		}
 
-		//Select center cell as first move
-		if(MC.length == 0){
-			MNKCell MiddleCell = new MNKCell(B.M/2, B.N/2);
-			B.markCell(MiddleCell.i, MiddleCell.j);
-			return MiddleCell;
-		}
-
 		//Use the first available cell if something goes wrong
 		MNKCell BestMove = FC[0]; 
 
@@ -94,43 +93,38 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		Integer MaxMoveValue = Integer.MIN_VALUE;
 
 		//DEBUG
-		System.out.println("\n ####################################### \n");
+		//System.out.println("\n ####################################### \n");
 
 		//If found the best move possible (immediate win) return immediately
 		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-1))){
 
-			System.err.println("START SEARCH FOR WIN");
+			//System.err.println("START SEARCH FOR WIN");
 
 			//Check if immediate win is possible
 			MNKCell ImmediateWinCell = checkImmediateWin();
 
 			//Exit the loop if found way not to lose
 			if(ImmediateWinCell != null){
-				System.err.println("FOUND IMMEDIATE WIN");
+				//System.err.println("FOUND IMMEDIATE WIN");
 				B.markCell(ImmediateWinCell.i, ImmediateWinCell.j); //Update local board with this move
 				return ImmediateWinCell;
 			}
 		}
 
 		//Return immediately by intercepting player2 winning move before he does
+		MNKCell PreventLossCell = null;
+		
 		//Check if there are already enough symbols placed for player2 to reach victory
 		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-3))){
 
-			System.err.println("START SEARCH FOR LOSS");
+			//System.err.println("START SEARCH FOR LOSS");
 
 			//Check if immediate loss is possible
-			MNKCell PreventLossCell = checkImmediateLoss();
-
-			//Exit the loop if found way not to lose
-			if(PreventLossCell != null){
-				System.err.println("FOUND IMMEDIATE LOSS");
-				B.markCell(PreventLossCell.i, PreventLossCell.j); //Update local board with this move
-				return PreventLossCell;
-			}
+			PreventLossCell = checkImmediateLoss();
 		}
 		
 
-		//CANNOT IMMEDIATELY LOSE OR WIN, PROCEED WITH MINIMAX
+		//CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX
 
 		//Cycle through all possible cells
 		for(MNKCell d : FC) {
@@ -142,7 +136,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
             Integer MoveVal = miniMax(MAX_DEPTH, false, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
 			//DEBUG
-			System.err.println(d.i + " " + d.j + " = " + MoveVal);
+			//System.err.println(d.i + " " + d.j + " = " + MoveVal);
 
 			//Rollback
 			B.unmarkCell();
@@ -152,6 +146,20 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				MaxMoveValue = MoveVal;
 				BestMove = d;
 			}
+		}
+
+		//Select center cell as first move (placed here to do computation and fill hashtable anyway before first move)
+		if(MC.length == 0){
+			MNKCell MiddleCell = new MNKCell(B.M/2, B.N/2);
+			B.markCell(MiddleCell.i, MiddleCell.j);
+			return MiddleCell;
+		}
+
+		//Select cell that would make the opponent win as is for sure the best move (placed here to do computation and fill hashtable anyway)
+		if(PreventLossCell != null){
+			//System.err.println("FOUND IMMEDIATE LOSS");
+			B.markCell(PreventLossCell.i, PreventLossCell.j); //Update local board with this move
+			return PreventLossCell;
 		}
 
 		//Return the result
@@ -166,7 +174,8 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		int StaticEvaluation = evaluateBoard(depth);
 
 		//Base case, evaluation detected gameover or depth limit reached
-		if(B.gameState() != MNKGameState.OPEN || depth == 0){
+		if(B.gameState() != MNKGameState.OPEN)// || depth == 0)
+		{
 			//if(depth == 0)
 			//	System.err.println("Depth reached 0");
 			return StaticEvaluation;
@@ -182,14 +191,29 @@ public class MiniMaxPlayer  implements MNKPlayer {
 			MNKCell FC[] = B.getFreeCells();
 			for(MNKCell current : FC) {
 
+				
 				//Mark this cell as player move
 				B.markCell(current.i, current.j);
 
-				//Recursively call minmax on this board scenario
-				MaxValue = Math.max(MaxValue, miniMax(depth-1, false, alpha, beta));			
+				//Check if already evaluated this game state
+				long boardHash = ZT.computeHash(B);
+				Integer boardValue = EvaluatedStates.getOrDefault(boardHash, null);
+				if(boardValue != null){
+					//System.out.println("Already evaluated"); //Already evaluated this state, no need to proceed with minimax
+				}
+				else{
+					//Recursively call minmax on this board scenario
+					boardValue = miniMax(depth-1, false, alpha, beta);
+
+					//Add current value to HashSet for future use
+					EvaluatedStates.put(boardHash, boardValue);	
+				}
 
 				//Undo the move
 				B.unmarkCell();
+
+				//Check if found better value
+				MaxValue = Math.max(MaxValue, boardValue);	
 
 				//Prune if better result was available before, no need to continue searching
 				alpha = Math.max(alpha, MaxValue);
@@ -214,11 +238,25 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				//Mark this cell as player move
 				B.markCell(current.i, current.j);
 
-				//Recursively call minmax on this board scenario
-				MinValue = Math.min(MinValue, miniMax(depth-1, true, alpha, beta));
+				//Check if already evaluated this game state
+				long boardHash = ZT.computeHash(B);
+				Integer boardValue = EvaluatedStates.getOrDefault(boardHash, null);
+				if (boardValue != null) {
+					//System.out.println("Already evaluated"); //Already evaluated this state, no need to proceed with minimax
+				} else{
+
+					//Recursively call minmax on this board scenario
+					boardValue = miniMax(depth-1, true, alpha, beta);
+
+					//Add current value to HashSet for future use
+					EvaluatedStates.put(boardHash, boardValue);	
+				}
 
 				//Undo the move
 				B.unmarkCell();
+
+				//Check if found better value
+				MinValue = Math.min(MinValue, boardValue);	
 
 				//Prune if better result was available before, no need to continue searching
 				beta = Math.max(beta, MinValue);
@@ -239,9 +277,9 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 		//Game over
         if(B.gameState() == myWin)
-			return MAX_VALUE + depth; //Sum depth to prefer faster win 
+			return MAX_VALUE; // + depth; //Sum depth to prefer faster win (ignored as method to check immediate win is present)
 		else if (B.gameState() == yourWin)
-			return -MAX_VALUE - depth;
+			return -MAX_VALUE; // - depth;
 
 		//Draw or not defined
 		return 0;
@@ -277,7 +315,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				//Detect move outcome
 				if(GameState == yourWin)
 				{
-					System.err.println("P2 wins with " + current.i + " " + current.j);
+					//System.err.println("P2 wins with " + current.i + " " + current.j);
 					WinningCellForP2 = current; //By selecting this cell P2 does win
 					WinningCellsCount++;
 				}
@@ -292,6 +330,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 			//Maybe we found a cell that leads him to victory
 			if(WinningCellsCount == 1 && WinningCellForP2 != null)
 				return WinningCellForP2;
+			//else if(WinningCellsCount > 2)
 
 			//Reset and try again
 			WinningCellsCount = 0;
@@ -332,7 +371,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	public void printGameState(){
 		for (int i = 0; i < B.M; i++) { // Print gameboard
 			for (int j = 0; j < B.N; j++) {
-				System.out.println(i + " " + j + ": " + B.B[i][j].toString());
+				//System.out.println(i + " " + j + ": " + B.B[i][j].toString());
 			}
 		}
 	}
