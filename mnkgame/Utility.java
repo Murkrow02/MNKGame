@@ -1,15 +1,14 @@
 package mnkgame;
 
-import java.math.BigInteger;
-
 public class Utility {
-    public static BigInteger bigFactorial(int n) {
+    
+    public static int Factorial(int n) {
 
-        BigInteger result = BigInteger.ONE;
+        int result = 1;
 
         try {
             for (int i = 2; i <= n; i++)
-                result = result.multiply(BigInteger.valueOf(i));
+                result = result * i;
 
         } catch (Exception ex) {
             return result; // maximum value reached

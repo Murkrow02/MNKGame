@@ -1,16 +1,6 @@
-/*
- * TODO: Insert all possible win/loss already in hash table
- * 
- */
-
 package mnkgame;
 
-import java.math.BigInteger;
 import java.util.Hashtable;
-import java.util.Random;
-
-import javax.crypto.spec.DHPrivateKeySpec;
-
 import mnkgame.MNKBoard;
 import mnkgame.MNKCell;
 import mnkgame.MNKGameState;
@@ -18,17 +8,24 @@ import mnkgame.MiniMaxMove;
 import mnkgame.ZobristTable;
 import mnkgame.Utility;
 
-/**
- * Totally random software player.
+/*
+ * TODO: Insert all possible win/loss already in hash table
+ *  CHECK SIMMETRIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ *  Continua tutorial con le tecniche
  */
+
 public class MiniMaxPlayer  implements MNKPlayer {
 
 	private int TIMEOUT;
-	public int MAX_DEPTH = 5;
+	private double DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE=98;
+	private double TRIGGER_TIMEOUT_PERCENTAGE=98;
+	//public int MAX_DEPTH = 5;
 	private static final int MAX_VALUE = 10;
 	private MNKBoard B;
 	private MNKGameState myWin;
 	private MNKGameState yourWin;
+	private MNKCellState myState;
+	private MNKCellState yourState;
 	private boolean meFirst;
 
 	/* This tri-dimensional array stores M*N random values, is used 
@@ -55,23 +52,28 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		yourWin = first ? MNKGameState.WINP2 : MNKGameState.WINP1;
 		meFirst = first;
 		TIMEOUT = timeout_in_secs;	
+		myState = meFirst ? MNKCellState.P1 : MNKCellState.P2;
+		yourState = meFirst ? MNKCellState.P2 : MNKCellState.P1;
 
 		//Initialize Zobrist table
 		ZT = new ZobristTable(M,N);
 
 		//Initialize hash table 
-		BigInteger AllPossibleBoardStates = Utility.bigFactorial(M*N);
-		EvaluatedStates = new Hashtable<Long, Integer>(M*N); //Default initial capacity
+		int MaxTableSize = 1<<20; // 2^20
+		int TableSize = 1<<M*N; // 2^M*N
+		if(TableSize > MaxTableSize)
+			TableSize = MaxTableSize;
+		EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
+
+		//Calculate after how much time trigger timeout warning
+		//DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE = 99-(M*N/5);
 	}
 
-	long start = 0;
+	long timerStart = 0;
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
 
 		//Start timer
-		start = System.currentTimeMillis();
-
-		//Set max depth based on how many free cell we have
-		MAX_DEPTH = 25-FC.length;
+		timerStart = System.currentTimeMillis();
 
 		//Update local board
 		if(MC.length > 0) {
@@ -133,10 +135,12 @@ public class MiniMaxPlayer  implements MNKPlayer {
 			B.markCell(d.i, d.j);
 
 			//Apply minimax algorithm on the cell
-            Integer MoveVal = miniMax(MAX_DEPTH, false, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 0);
 
 			//DEBUG
 			//System.err.println(d.i + " " + d.j + " = " + MoveVal);
+			System.out.println(evaluations + ", ");
+			evaluations = 0;
 
 			//Rollback
 			B.unmarkCell();
@@ -146,6 +150,12 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				MaxMoveValue = MoveVal;
 				BestMove = d;
 			}
+
+			//Check timeout
+			if(isTimeExpiring())
+				break;
+			else
+				TRIGGER_TIMEOUT_PERCENTAGE = DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 		}
 
 		//Select center cell as first move (placed here to do computation and fill hashtable anyway before first move)
@@ -167,11 +177,19 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-	
-    public Integer miniMax(int depth, boolean maximizingPlayer, int alpha, int beta){
+	int evaluations = 0; //debug
+    public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth){
+
+		//DEBUG
+		evaluations++;
+
+		/*Each time we enter a recursive call, timeout should trigger 
+		* a little bit earlier as we need to rollback all calls on stack when first triggered
+		*/
+		TRIGGER_TIMEOUT_PERCENTAGE = DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.25);
 
 		//Static evaluation of current game board
-		int StaticEvaluation = evaluateBoard(depth);
+		int StaticEvaluation = evaluateBoard();
 
 		//Base case, evaluation detected gameover or depth limit reached
 		if(B.gameState() != MNKGameState.OPEN)// || depth == 0)
@@ -196,14 +214,14 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Check if already evaluated this game state
-				long boardHash = ZT.computeHash(B);
+				long boardHash = previousHash != null ? ZT.addHash(previousHash, current, myState) : ZT.computeHash(B);
 				Integer boardValue = EvaluatedStates.getOrDefault(boardHash, null);
 				if(boardValue != null){
 					//System.out.println("Already evaluated"); //Already evaluated this state, no need to proceed with minimax
 				}
 				else{
 					//Recursively call minmax on this board scenario
-					boardValue = miniMax(depth-1, false, alpha, beta);
+					boardValue = miniMax(false, alpha, beta, boardHash, depth++);
 
 					//Add current value to HashSet for future use
 					EvaluatedStates.put(boardHash, boardValue);	
@@ -239,14 +257,14 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Check if already evaluated this game state
-				long boardHash = ZT.computeHash(B);
+				long boardHash = previousHash != null ? ZT.addHash(previousHash, current, yourState) : ZT.computeHash(B);
 				Integer boardValue = EvaluatedStates.getOrDefault(boardHash, null);
 				if (boardValue != null) {
 					//System.out.println("Already evaluated"); //Already evaluated this state, no need to proceed with minimax
 				} else{
 
 					//Recursively call minmax on this board scenario
-					boardValue = miniMax(depth-1, true, alpha, beta);
+					boardValue = miniMax(true, alpha, beta, boardHash, depth++);
 
 					//Add current value to HashSet for future use
 					EvaluatedStates.put(boardHash, boardValue);	
@@ -273,7 +291,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 	//IDEA: at the beginning implement a normal minimax algorithm with 1 win 0 lose, next
 	// try to use more values such as 0.5 if the move is making 2/3 marks lined up and player is going to win (opposite for adversary)
-	public int evaluateBoard(int depth) {
+	public int evaluateBoard() {
 
 		//Game over
         if(B.gameState() == myWin)
@@ -362,7 +380,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	}
 
 	public boolean isTimeExpiring(){
-		boolean Expiring = (System.currentTimeMillis()-start)/1000.0 > TIMEOUT*(99.0/100.0);
+		boolean Expiring = (System.currentTimeMillis()-timerStart)/1000.0 > TIMEOUT*(TRIGGER_TIMEOUT_PERCENTAGE/100.0);
 		//if(Expiring)
 		// 	System.err.println("Timeout");
 		return Expiring;

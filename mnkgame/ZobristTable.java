@@ -26,29 +26,37 @@ public class ZobristTable {
         }
     }
 
-    //private static long opponentTurnHash = 81293; // Random number
+    /*
+     * Main Zobrist function, cycles through all the given pieces and 
+     * starting from zero, bitwise XOR with the hash with the randomly generated 
+     * number from the constructor given to each place on board
+     */
     public long computeHash(MNKBoard B) {
 
         long hash = 0;
 
-        // Hash differently based on whom turn it is (not needed)
-        //if (opponentTurn)
-        //    hash ^= opponentTurnHash;
-
         // Hash based on current table situation
         MNKCell MC[] = B.getMarkedCells();
         for (MNKCell current : MC) {
-            hash ^= ZT[current.i][current.j][pieceId(current)];// Bitwise XOR
+            hash ^= ZT[current.i][current.j][pieceId(current.state)];// Bitwise XOR
         }
 
         return hash;
     }
 
+    /*
+     * Function used to speed up hash calculation, if we already have a hash
+     * and only one piece changed then we can immediately calculate new hash
+     */
+    public long addHash(long previousHash, MNKCell newCell, MNKCellState state){
+        return previousHash ^= ZT[newCell.i][newCell.j][pieceId(state)];
+    }
+
     // If the cell is occupied by P1 return 0, otherwhise (P2) return 1
-    private int pieceId(MNKCell cell) {
-        if (cell.state == MNKCellState.P1)
+    private int pieceId(MNKCellState state) {
+        if (state == MNKCellState.P1)
             return 0;
-        else if (cell.state == MNKCellState.P2)
+        else if (state == MNKCellState.P2)
             return 1;
         else
             return -1;
