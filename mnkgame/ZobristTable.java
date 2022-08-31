@@ -52,6 +52,35 @@ public class ZobristTable {
         return previousHash ^= ZT[newCell.i][newCell.j][pieceId(state)];
     }
 
+    public long simmetryHash(MNKBoard b){
+
+		long finalHash = 0;
+		int lastColumnIndex = b.N-1;
+
+		//Create custom board to calculate hash
+		//CustomMNKBoard simmetricBoard = new CustomMNKBoard(b.M, b.N, b.K);
+
+		//Check if even columns
+		boolean evenColumns = b.N%2 == 0;
+		int middleColumn = evenColumns ? b.N/2 : (b.N/2)+1;
+
+		//Cycle through already marked cells
+		for(MNKCell current : b.MC) {
+
+			//If we are on middle column on non-even column board do nothing
+			if(current.j == middleColumn && !evenColumns)
+				continue;
+
+			//Move mark from the left side to right and vice-versa
+			MNKCell simmetricCell = new MNKCell(current.i, lastColumnIndex-current.j);
+
+			//Add new cell to final hash
+			finalHash = addHash(finalHash, simmetricCell, current.state);
+		}
+
+		return finalHash;
+	}
+
     // If the cell is occupied by P1 return 0, otherwhise (P2) return 1
     private int pieceId(MNKCellState state) {
         if (state == MNKCellState.P1)

@@ -7,11 +7,12 @@ import mnkgame.MNKGameState;
 import mnkgame.MiniMaxMove;
 import mnkgame.ZobristTable;
 import mnkgame.Utility;
+import mnkgame.CustomMNKBoard;
 
 /*
  * TODO: Insert all possible win/loss already in hash table
- *  CHECK SIMMETRIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- *  Continua tutorial con le tecniche
+ *  Add also vertical simmetries!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ *  Negamax negascout
  */
 
 public class MiniMaxPlayer  implements MNKPlayer {
@@ -186,7 +187,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		/*Each time we enter a recursive call, timeout should trigger 
 		* a little bit earlier as we need to rollback all calls on stack when first triggered
 		*/
-		TRIGGER_TIMEOUT_PERCENTAGE = DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.25);
+		TRIGGER_TIMEOUT_PERCENTAGE = DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.5);
 
 		//Static evaluation of current game board
 		int StaticEvaluation = evaluateBoard();
@@ -225,6 +226,9 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 					//Add current value to HashSet for future use
 					EvaluatedStates.put(boardHash, boardValue);	
+
+					//Add simmetric board state to HashSet as it has the same static evaluation
+					//EvaluatedStates.put(ZT.simmetryHash(B), boardValue);
 				}
 
 				//Undo the move
@@ -268,6 +272,9 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 					//Add current value to HashSet for future use
 					EvaluatedStates.put(boardHash, boardValue);	
+
+					//Add simmetric board state to HashSet as it has the same static evaluation
+					//EvaluatedStates.put(ZT.simmetryHash(B), boardValue);
 				}
 
 				//Undo the move
