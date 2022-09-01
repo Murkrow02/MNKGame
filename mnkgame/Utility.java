@@ -1,5 +1,7 @@
 package mnkgame;
 
+import mnkgame.MNKCell;
+import mnkgame.MNKCellState;
 public class Utility {
     
     public static int Factorial(int n) {
@@ -16,4 +18,20 @@ public class Utility {
 
         return result;
     }
+
+    public static void printGameState(MNKBoard b){
+        System.out.print("\n");
+		for (int i = 0; i < b.M; i++) { // Print gameboard
+			for (int j = 0; j < b.N; j++) {
+                String mark = "-";
+                if(b.B[i][j] == MNKCellState.P1)
+                    mark = "X";
+                else if (b.B[i][j] == MNKCellState.P2)
+                    mark = "O";
+				System.out.print(mark + "\t");
+			}
+
+            System.out.print("\n");
+		}
+	}
 }

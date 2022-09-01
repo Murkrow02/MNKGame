@@ -11,7 +11,6 @@ import mnkgame.CustomMNKBoard;
 
 /*
  * TODO: Insert all possible win/loss already in hash table
- *  Add also vertical simmetries!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  *  Negamax negascout
  */
 
@@ -34,11 +33,6 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	   each possible game state
 	*/
 	public ZobristTable ZT;
-
-	/* Insert and access quickly (O(1)) to already evaluated game states
-	 * uniquely identified by Zobrist Hash function
-	 */
-	public Hashtable<Long, Integer> EvaluatedStates;
 
 	/**
    * Default empty constructor
@@ -64,7 +58,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		int TableSize = 1<<M*N; // 2^M*N
 		if(TableSize > MaxTableSize)
 			TableSize = MaxTableSize;
-		EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
+		ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
 
 		//Calculate after how much time trigger timeout warning
 		//DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE = 99-(M*N/5);
@@ -215,8 +209,8 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.addHash(previousHash, current, myState) : ZT.computeHash(B);
-				Integer boardValue = EvaluatedStates.getOrDefault(boardHash, null);
+				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, myState) : ZT.computeHash(B);
+				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
 				if(boardValue != null){
 					//System.out.println("Already evaluated"); //Already evaluated this state, no need to proceed with minimax
 				}
@@ -225,10 +219,10 @@ public class MiniMaxPlayer  implements MNKPlayer {
 					boardValue = miniMax(false, alpha, beta, boardHash, depth++);
 
 					//Add current value to HashSet for future use
-					EvaluatedStates.put(boardHash, boardValue);	
+					ZT.EvaluatedStates.put(boardHash, boardValue);	
 
-					//Add simmetric board state to HashSet as it has the same static evaluation
-					//EvaluatedStates.put(ZT.simmetryHash(B), boardValue);
+					//Add simmetric board states to HashSet as they have the same static evaluation
+					ZT.addSimmetryHashes(B, boardValue);
 				}
 
 				//Undo the move
@@ -261,8 +255,8 @@ public class MiniMaxPlayer  implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.addHash(previousHash, current, yourState) : ZT.computeHash(B);
-				Integer boardValue = EvaluatedStates.getOrDefault(boardHash, null);
+				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, yourState) : ZT.computeHash(B);
+				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
 				if (boardValue != null) {
 					//System.out.println("Already evaluated"); //Already evaluated this state, no need to proceed with minimax
 				} else{
@@ -271,10 +265,10 @@ public class MiniMaxPlayer  implements MNKPlayer {
 					boardValue = miniMax(true, alpha, beta, boardHash, depth++);
 
 					//Add current value to HashSet for future use
-					EvaluatedStates.put(boardHash, boardValue);	
+					ZT.EvaluatedStates.put(boardHash, boardValue);	
 
-					//Add simmetric board state to HashSet as it has the same static evaluation
-					//EvaluatedStates.put(ZT.simmetryHash(B), boardValue);
+					//Add simmetric board states to HashSet as they have the same static evaluation
+					ZT.addSimmetryHashes(B, boardValue);
 				}
 
 				//Undo the move
@@ -393,13 +387,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		return Expiring;
 	}
 
-	public void printGameState(){
-		for (int i = 0; i < B.M; i++) { // Print gameboard
-			for (int j = 0; j < B.N; j++) {
-				//System.out.println(i + " " + j + ": " + B.B[i][j].toString());
-			}
-		}
-	}
+	
 
 	
 

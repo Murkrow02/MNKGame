@@ -14,7 +14,7 @@ public class CustomMNKBoard extends MNKBoard {
     }
 
     public void customMarkCell(int i, int j, MNKCellState state) throws IndexOutOfBoundsException, IllegalStateException {
-		B[i][j] = state;
+		  B[i][j] = state;
     }
     
 }
