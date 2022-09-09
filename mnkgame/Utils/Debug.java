@@ -1,23 +1,10 @@
 package mnkgame;
 
-import mnkgame.MNKCell;
-import mnkgame.MNKCellState;
-public class Utility {
-    
-    public static int Factorial(int n) {
+import mnkgame.*;
 
-        int result = 1;
+public class Debug {
 
-        try {
-            for (int i = 2; i <= n; i++)
-                result = result * i;
-
-        } catch (Exception ex) {
-            return result; // maximum value reached
-        }
-
-        return result;
-    }
+    public static int Evaluations = 0;
 
     public static void printGameState(MNKBoard b){
         System.out.print("\n");
@@ -34,4 +21,20 @@ public class Utility {
             System.out.print("\n");
 		}
 	}
+
+    public static void Divider(){
+        System.out.println("\n ####################################### \n");
+    }
+
+    public static void FoundEnd(boolean win){
+
+        if(win)
+            System.out.println("Found immediate win");
+        else
+            System.out.println("Found immediate loss");
+    }
+
+    public static void PrintMiddleCicle(MNKBoard b){
+        Evaluations = 0;
+    }
 }

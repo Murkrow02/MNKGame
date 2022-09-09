@@ -1,25 +1,20 @@
 package mnkgame;
 
 import java.util.Hashtable;
-import mnkgame.MNKBoard;
-import mnkgame.MNKCell;
-import mnkgame.MNKGameState;
-import mnkgame.MiniMaxMove;
-import mnkgame.ZobristTable;
-import mnkgame.Utility;
-import mnkgame.CustomMNKBoard;
+import mnkgame.*;
 
 /*
  * TODO: Insert all possible win/loss already in hash table
  *  Negamax negascout
+ *  Sometime AI is dumb and does not prevent the opponent to place more symbols near each other
+ * 	Use try catch to immediately stop minimax when timeout found
  */
 
-public class MiniMaxPlayer  implements MNKPlayer {
+public class ZobristPlayerSimmetry  implements MNKPlayer {
 
 	private int TIMEOUT;
 	private double DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE=98;
 	private double TRIGGER_TIMEOUT_PERCENTAGE=98;
-	//public int MAX_DEPTH = 5;
 	private static final int MAX_VALUE = 10;
 	private MNKBoard B;
 	private MNKGameState myWin;
@@ -37,16 +32,25 @@ public class MiniMaxPlayer  implements MNKPlayer {
 	/**
    * Default empty constructor
    */
-	public MiniMaxPlayer() {
+	public ZobristPlayerSimmetry() {
 	}
 
 	public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
 		
-		B       = new MNKBoard(M,N,K); //LOCAL BOARD
+		//LOCAL BOARD
+		B       = new MNKBoard(M,N,K); 
+
+		//Possible gamestates
 		myWin   = first ? MNKGameState.WINP1 : MNKGameState.WINP2; 
 		yourWin = first ? MNKGameState.WINP2 : MNKGameState.WINP1;
+
+		//Save if we are the first player
 		meFirst = first;
+
+		//If the function takes longer than the set timeout an exception is thrown
 		TIMEOUT = timeout_in_secs;	
+
+		//How the cells are marked in this match
 		myState = meFirst ? MNKCellState.P1 : MNKCellState.P2;
 		yourState = meFirst ? MNKCellState.P2 : MNKCellState.P1;
 
@@ -55,28 +59,30 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 		//Initialize hash table 
 		int MaxTableSize = 1<<20; // 2^20
-		int TableSize = 1<<M*N; // 2^M*N
+		int TableSize = 1<<M*N; // 2^M*N, this size is related to board size
+
+		//Creating a huge hashtable could crash the application
 		if(TableSize > MaxTableSize)
 			TableSize = MaxTableSize;
-		ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
 
-		//Calculate after how much time trigger timeout warning
-		//DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE = 99-(M*N/5);
+		//Init hashtable with desired size
+		ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
 	}
 
+	//Save the time when this function is called
 	long timerStart = 0;
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
 
 		//Start timer
 		timerStart = System.currentTimeMillis();
 
-		//Update local board
+		//Update local board with last move from opponent
 		if(MC.length > 0) {
 			MNKCell c = MC[MC.length-1]; // Recover move from opponent
 			B.markCell(c.i,c.j);         // Save the last move in the local MNKBoard
 		}
 		
-		// If there is just one possible move, return immediately
+		// If there is just one possible move, return immediately (match is over)
 		if(FC.length == 1)
 		{
 			B.markCell(FC[0].i, FC[0].j);
@@ -86,24 +92,27 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		//Use the first available cell if something goes wrong
 		MNKCell BestMove = FC[0]; 
 
-		//Initialize with relaxing technique
+		//Initially assume the best move is the worst possible value and then use relaxing technique
 		Integer MaxMoveValue = Integer.MIN_VALUE;
 
 		//DEBUG
-		//System.out.println("\n ####################################### \n");
+		Debug.Divider();
 
 		//If found the best move possible (immediate win) return immediately
 		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-1))){
-
-			//System.err.println("START SEARCH FOR WIN");
 
 			//Check if immediate win is possible
 			MNKCell ImmediateWinCell = checkImmediateWin();
 
 			//Exit the loop if found way not to lose
 			if(ImmediateWinCell != null){
-				//System.err.println("FOUND IMMEDIATE WIN");
-				B.markCell(ImmediateWinCell.i, ImmediateWinCell.j); //Update local board with this move
+
+				//Update local board with this move
+				B.markCell(ImmediateWinCell.i, ImmediateWinCell.j); 
+
+				//DEBUG
+				Debug.FoundEnd(true);
+
 				return ImmediateWinCell;
 			}
 		}
@@ -114,14 +123,12 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		//Check if there are already enough symbols placed for player2 to reach victory
 		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-3))){
 
-			//System.err.println("START SEARCH FOR LOSS");
-
 			//Check if immediate loss is possible
 			PreventLossCell = checkImmediateLoss();
 		}
 		
 
-		//CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX
+		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
 		//Cycle through all possible cells
 		for(MNKCell d : FC) {
@@ -133,9 +140,7 @@ public class MiniMaxPlayer  implements MNKPlayer {
             Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 0);
 
 			//DEBUG
-			//System.err.println(d.i + " " + d.j + " = " + MoveVal);
-			System.out.println(evaluations + ", ");
-			evaluations = 0;
+			Debug.PrintMiddleCicle(B);
 
 			//Rollback
 			B.unmarkCell();
@@ -160,9 +165,13 @@ public class MiniMaxPlayer  implements MNKPlayer {
 			return MiddleCell;
 		}
 
-		//Select cell that would make the opponent win as is for sure the best move (placed here to do computation and fill hashtable anyway)
+		/*Select cell that would make the opponent win as is for sure the best move 
+			(placed here to do computation and fill hashtable anyway)*/
 		if(PreventLossCell != null){
-			//System.err.println("FOUND IMMEDIATE LOSS");
+			
+			//DEBUG
+			Debug.FoundEnd(false);
+
 			B.markCell(PreventLossCell.i, PreventLossCell.j); //Update local board with this move
 			return PreventLossCell;
 		}
@@ -172,11 +181,10 @@ public class MiniMaxPlayer  implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-	int evaluations = 0; //debug
     public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth){
 
 		//DEBUG
-		evaluations++;
+		Debug.Evaluations++;
 
 		/*Each time we enter a recursive call, timeout should trigger 
 		* a little bit earlier as we need to rollback all calls on stack when first triggered
@@ -382,14 +390,8 @@ public class MiniMaxPlayer  implements MNKPlayer {
 
 	public boolean isTimeExpiring(){
 		boolean Expiring = (System.currentTimeMillis()-timerStart)/1000.0 > TIMEOUT*(TRIGGER_TIMEOUT_PERCENTAGE/100.0);
-		//if(Expiring)
-		// 	System.err.println("Timeout");
 		return Expiring;
 	}
-
-	
-
-	
 
 	public String playerName() {
 		return "Mettaton NEO";

@@ -1,7 +1,7 @@
 - Command-line compile.  In the mnkgame/ directory run::
 
-		javac -cp ".." *.java
-
+	javac -d out */*.java *.java
+	cd out/mnkgame
 
 MNKGame application:
 
