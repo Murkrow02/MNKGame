@@ -115,6 +115,16 @@ public class Utility {
 		return null;
 	}
 
+	 // If the cell is occupied by P1 return 0, otherwhise (P2) return 1
+	 public static int pieceId(MNKCellState state) {
+        if (state == MNKCellState.P1)
+            return 0;
+        else if (state == MNKCellState.P2)
+            return 1;
+        else
+            return -1;
+    }
+
     public boolean isTimeExpiring(){
 		boolean Expiring = (System.currentTimeMillis()-timerStart)/1000.0 > TIMEOUT*(TRIGGER_TIMEOUT_PERCENTAGE/100.0);
 		return Expiring;
