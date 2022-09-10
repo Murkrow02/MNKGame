@@ -64,8 +64,12 @@ public class NegaMax  implements MNKPlayer {
 		//Cycle through all possible cells
 		for(MNKCell d : FC) {
 
+			B.markCell(d.i, d.j);
+
 			//Apply minimax algorithm on the cell
             Integer MoveVal = -negaMax(-1);
+
+			B.unmarkCell();
 
 			//DEBUG
 			Debug.PrintMiddleCicle(B, d, MoveVal);
@@ -102,7 +106,7 @@ public class NegaMax  implements MNKPlayer {
 		{
 			//if(depth == 0)
 			//	System.err.println("Depth reached 0");
-			return utility.evaluateBoard(B, 0)*sign;
+			return utility.evaluateBoard(B,0)*sign;
 		}
 
 			//Relax technique, assume the worst case scenario and relax on each step
@@ -116,10 +120,12 @@ public class NegaMax  implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Recursively call minmax on this board scenario
-				bestValue = Math.max(bestValue, -negaMax(-sign));
+				Integer boardValue = -negaMax(-sign);
 
 				//Revert move 
 				B.unmarkCell();
+
+				bestValue = Math.max(bestValue, boardValue);
 			}
 
 			//Return the best value obtained
