@@ -169,15 +169,12 @@ public class MiniMaxAlphaBeta  implements MNKPlayer {
 		*/
 		utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.5);
 
-		//Static evaluation of current game board
-		int StaticEvaluation = utility.evaluateBoard(B, depth);
-
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring())// || depth == 0)
 		{
 			//if(depth == 0)
 			//	System.err.println("Depth reached 0");
-			return StaticEvaluation;
+			return utility.evaluateBoard(B, depth);
 		}
 
 		//Our turn (Maximizing)

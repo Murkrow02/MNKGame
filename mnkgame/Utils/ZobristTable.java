@@ -62,9 +62,13 @@ public class ZobristTable {
 
     public void addSimmetryHashes(MNKBoard b, int value){
 
-		long xHash = 0;
-        long yHash = 0;
-        long xyHash = 0;
+		long Hash90 = 0;    // 90 degrees rotation
+        long Hash180 = 0;   // 180 degrees rotation
+        long Hash270 = 0;   // 270 degrees rotation
+        long HashS = 0;     // Specular of original
+        long Hash90S = 0;    // 90 degrees rotation specular
+        long Hash180S = 0;   // 180 degrees rotation specular
+        long Hash270S = 0;   // 270 degrees rotation specular
 		int lastColumnIndex = b.N-1;
         int lastRowIndex = b.M-1;
 
@@ -73,71 +77,51 @@ public class ZobristTable {
         // CustomMNKBoard simmetricYBoard = new CustomMNKBoard(b.M, b.N, b.K);
         // CustomMNKBoard simmetricXYBoard = new CustomMNKBoard(b.M, b.N, b.K);
 
-		//Check if even columns
+		//Check if even columns and rows
 		boolean evenColumns = b.N%2 == 0;
         boolean evenRows = b.M%2 == 0;
+
+        //Find middle columns and rows
 		int middleColumn = b.N/2;
         int middleRow = b.M/2;
 
 		//Cycle through already marked cells
-		for(MNKCell current : b.MC) {
-
-			//Reflect on X axys
-			if(current.j != middleColumn || evenColumns)
-			{
-                //Move mark from the left side to right and vice-versa
-			    MNKCell simmetricCell = new MNKCell(current.i, lastColumnIndex-current.j);
-
-                //Debug
-                //simmetricXBoard.customMarkCell(simmetricCell.i, simmetricCell.j, current.state);
-
-                //Add new cell to final hash
-			    xHash = diffHash(xHash, simmetricCell, current.state);
-            }
-            //No need to transpose
-            else{
-
-                //Debug
-                //simmetricXBoard.customMarkCell(current.i, current.j, current.state); 
-
-                //Add default cell to final hash
-			    xHash = diffHash(xHash, current, current.state);
-            }
-
-            //Reflect on Y axis
-            if(current.i != middleRow || evenRows){
-
-                //Move mark from the upper side to bottom and vice-versa
-                MNKCell simmetricCell = new MNKCell(lastRowIndex-current.i, current.j);
-
-                //Debug
-                //simmetricYBoard.customMarkCell(simmetricCell.i, simmetricCell.j, current.state);
-
-                //Add new cell to final hash
-			    yHash = diffHash(yHash, simmetricCell, current.state);
-            }else{
-
-                //Debug
-                //simmetricYBoard.customMarkCell(current.i, current.j, current.state); //Debug
-
-                //Add default cell to final hash
-			    yHash = diffHash(yHash, current, current.state);
-            }
-
-            //Reflect on XY if square table
-            if(b.M == b.N){
-
-                //Reflect on XY
-                MNKCell simmetricCell = new MNKCell(lastRowIndex-current.i, lastColumnIndex-current.j);
-
-                //Debug
-                //simmetricXYBoard.customMarkCell(simmetricCell.i, simmetricCell.j, current.state); 
-
-                //Add new cell to final hash
-                xyHash = diffHash(xyHash, simmetricCell, current.state);
-            }
-
+		for(MNKCell c : b.MC) {
 			
+            //Only quare board rotations
+            if(evenColumns && evenRows){
+
+                //Hash90
+                MNKCell rotate90 = new MNKCell(c.j, b.N - c.i-1);
+                Hash90 = diffHash(Hash90, rotate90, c.state);
+
+                //Hash90S
+                MNKCell rotate90S = new MNKCell(b.N - c.j - 1, b.M - c.i - 1);
+                Hash90S = diffHash(Hash90S, rotate90S, c.state);
+
+                //Hash 270
+                MNKCell rotate270 = new MNKCell(b.M - c.j - 1, c.i);
+                Hash270 = diffHash(Hash270, rotate270, c.state);
+
+                //Hash 270S
+                MNKCell rotate270S = new MNKCell(c.j, c.i);
+                Hash270S = diffHash(Hash270S, rotate270S, c.state);
+            }
+
+            //Square board and rect board rotations
+            
+            //Hash180
+            MNKCell rotate180 = new MNKCell(b.M - c.i - 1, b.N - c.j - 1);
+            Hash180 = diffHash(Hash180, rotate180, c.state);
+
+            //Hash180S
+            MNKCell rotate180S = new MNKCell(b.M - c.i - 1, c.j);
+            Hash180S = diffHash(Hash180S, rotate180S, c.state);
+
+            //Hash simmetrical
+            MNKCell rotateS = new MNKCell(c.i, b.N-c.j-1);
+            HashS = diffHash(HashS, rotateS, c.state);
+
 		}
 
         //DEBUG
@@ -149,9 +133,13 @@ public class ZobristTable {
         // Utility.printGameState(simmetricXYBoard);
 
 		//Add all calculated hashes to evaluated states
-        EvaluatedStates.put(xHash, value);
-        EvaluatedStates.put(yHash, value);
-        EvaluatedStates.put(xyHash, value);
+        EvaluatedStates.put(Hash90, value);
+        EvaluatedStates.put(Hash180, value);
+        EvaluatedStates.put(Hash270, value);
+        EvaluatedStates.put(HashS, value);
+        EvaluatedStates.put(Hash90S, value);
+        EvaluatedStates.put(Hash180S, value);
+        EvaluatedStates.put(Hash270S, value);
 	}
 
     // If the cell is occupied by P1 return 0, otherwhise (P2) return 1

@@ -5,7 +5,7 @@ import mnkgame.*;
 public class Debug {
 
     //Enable-disable debug logs
-    public static boolean active = true;
+    public static boolean active = false;
 
     public static long CellEvaluations = 0;
     public static long TotalEvaluations = 0;
@@ -89,7 +89,6 @@ public class Debug {
             MaxDepthReached = CellEvaluations;
 
         CellEvaluations = 0;
-
         System.out.println(cell.i + "," + cell.j + ": " + val);
     }
 

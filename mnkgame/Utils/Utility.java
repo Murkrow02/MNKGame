@@ -8,8 +8,8 @@ public class Utility {
     private final int MAX_VALUE = 10;
     public long timerStart = 0;
     public int TIMEOUT;
-	public double DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE=95;
-	public double TRIGGER_TIMEOUT_PERCENTAGE=95;
+	public double DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE=90;
+	public double TRIGGER_TIMEOUT_PERCENTAGE=90;
     
     public int Factorial(int n) {
 
@@ -32,9 +32,9 @@ public class Utility {
 
         // Game over
         if (B.gameState() == myWin)
-            return MAX_VALUE + depth;
+            return MAX_VALUE;// + depth;
         else if (B.gameState() == yourWin)
-            return -MAX_VALUE - depth;
+            return -MAX_VALUE;// - depth;
 
         // Draw or not defined
         return 0;

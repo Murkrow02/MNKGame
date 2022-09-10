@@ -1,0 +1,3 @@
+parla della funzione diffHash 
+parla delle differenze tra i vari player creati
+

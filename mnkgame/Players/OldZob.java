@@ -176,15 +176,12 @@ public class OldZob  implements MNKPlayer {
 		*/
 		TRIGGER_TIMEOUT_PERCENTAGE = DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.5);
 
-		//Static evaluation of current game board
-		int StaticEvaluation = evaluateBoard();
-
 		//Base case, evaluation detected gameover or depth limit reached
 		if(B.gameState() != MNKGameState.OPEN)// || depth == 0)
 		{
 			//if(depth == 0)
 			//	System.err.println("Depth reached 0");
-			return StaticEvaluation;
+			return evaluateBoard();
 		}
 
 		//Our turn (Maximizing)

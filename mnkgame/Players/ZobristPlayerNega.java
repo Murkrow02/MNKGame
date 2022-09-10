@@ -3,14 +3,7 @@ package mnkgame;
 import java.util.Hashtable;
 import mnkgame.*;
 
-/*
- * TODO: Insert all possible win/loss already in hash table
- *  Negamax negascout
- *  Sometime AI is dumb and does not prevent the opponent to place more symbols near each other
- * 	Use try catch to immediately stop minimax when timeout found
- */
-
-public class ZobristPlayer implements MNKPlayer {
+public class ZobristPlayerNega implements MNKPlayer {
 
 	private MNKBoard B;
 	private MNKCellState myState;
@@ -27,7 +20,7 @@ public class ZobristPlayer implements MNKPlayer {
 	/**
    * Default empty constructor
    */
-	public ZobristPlayer() {
+	public ZobristPlayerNega() {
 	}
 
 	public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
@@ -131,8 +124,8 @@ public class ZobristPlayer implements MNKPlayer {
 			//Mark this cell as player move (temp)
 			B.markCell(d.i, d.j);
 
-			//Apply minimax algorithm on the cell
-            Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 0);
+			//Apply negamax algorithm on the cell
+            Integer MoveVal = negaMax(Integer.MIN_VALUE, Integer.MAX_VALUE, null, 0);
 
 			//DEBUG
 			Debug.PrintMiddleCicle(B, d, MoveVal);
@@ -190,7 +183,7 @@ public class ZobristPlayer implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-    public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth){
+	public Integer negaMax(int alpha, int beta, Long previousHash, int depth){
 
 		//DEBUG
 		Debug.IncreaseEvaluations();
@@ -208,110 +201,54 @@ public class ZobristPlayer implements MNKPlayer {
 			return utility.evaluateBoard(B, depth);
 		}
 
-		//Our turn (Maximizing)
-		if(maximizingPlayer){
 
-			//Relax technique, assume the worst case scenario and relax on each step
-			Integer MaxValue = Integer.MIN_VALUE;
+		// Relax technique, assume the worst case scenario and relax on each step
+		Integer BestValue = Integer.MIN_VALUE;
 
-			//Cycle through all possible moves
-			MNKCell FC[] = B.getFreeCells();
-			for(MNKCell current : FC) {
+		// Cycle through all possible moves
+		MNKCell FC[] = B.getFreeCells();
+		for (MNKCell current : FC) {
 
-				
-				//Mark this cell as player move
-				B.markCell(current.i, current.j);
+			// Mark this cell as player move
+			B.markCell(current.i, current.j);
 
-				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, myState) : ZT.computeHash(B);
-				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
+			//Check if already evaluated this game state
+			long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, myState) : ZT.computeHash(B);
+			Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
 
-				//Already evaluated this game state
-				if(boardValue != null){
-					Debug.AlreadyEvaluated();
-				}
-				else{
-					//Recursively call minmax on this board scenario
-					boardValue = miniMax(false, alpha, beta, boardHash, depth--);
+			//Already evaluated this game state
+			if(boardValue != null){
+				Debug.AlreadyEvaluated();
+			}
+			else{
+				//Recursively call minmax on this board scenario
+				boardValue = -negaMax(-alpha, -beta,null, depth++);
 
-					//Add current value to HashSet for future use
-					ZT.EvaluatedStates.put(boardHash, boardValue);	
+				//Add current value to HashSet for future use
+				ZT.EvaluatedStates.put(boardHash, boardValue);	
 
-					//Add simmetric board states to HashSet as they have the same static evaluation
-					ZT.addSimmetryHashes(B, boardValue);
-				}
-
-				//Undo the move
-				B.unmarkCell();
-
-				//Check if found better value
-				MaxValue = Math.max(MaxValue, boardValue);	
-
-				//Prune if better result was available before, no need to continue searching
-				alpha = Math.max(alpha, MaxValue);
-				if (alpha >= beta) {
-					Debug.Cuts++;
-					return MaxValue;
-				}
+				//Add simmetric board states to HashSet as they have the same static evaluation
+				ZT.addSimmetryHashes(B, boardValue);
 			}
 
-			//Return the best value obtained
-			return MaxValue;
-		}
-		//Opponent turn (minimizing)
-		else{
+			// Undo the move
+			B.unmarkCell();
 
-			//Relax technique, assume the worst case scenario and relax on each step
-			Integer MinValue = Integer.MAX_VALUE;
-
-			//Cycle through all possible moves
-			MNKCell FC[] = B.getFreeCells();
-			for(MNKCell current : FC) {
-
-				//Mark this cell as player move
-				B.markCell(current.i, current.j);
-
-				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, yourState) : ZT.computeHash(B);
-				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
-				
-				//Already evaluated this state
-				if (boardValue != null) {
-					Debug.AlreadyEvaluated();
-				} else{
-
-					//Recursively call minmax on this board scenario
-					boardValue = miniMax(true, alpha, beta, boardHash, depth--);
-
-					//Add current value to HashSet for future use
-					ZT.EvaluatedStates.put(boardHash, boardValue);	
-
-					//Add simmetric board states to HashSet as they have the same static evaluation
-					ZT.addSimmetryHashes(B, boardValue);
-				}
-
-				//Undo the move
-				B.unmarkCell();
-
-				//Check if found better value
-				MinValue = Math.min(MinValue, boardValue);	
-
-				//Prune if better result was available before, no need to continue searching
-				beta = Math.min(beta, MinValue);
-				if (beta <= alpha) {
-					Debug.Cuts++;
-					return MinValue;
-				}
-			}
-
-			return MinValue;
+			//Cuts
+			if (boardValue > BestValue)
+				BestValue = boardValue;
+			if (BestValue > alpha) 
+				alpha = BestValue;
+			if (BestValue >= beta)
+				break;
 		}
 
-
-    }
+		// Return the best value obtained
+		return alpha;
+	}
 
 	public String playerName() {
-		return "Zob";
+		return "ZobNega";
 	}
 }
 

@@ -3,14 +3,7 @@ package mnkgame;
 import java.util.Hashtable;
 import mnkgame.*;
 
-/*
- * TODO: Insert all possible win/loss already in hash table
- *  Negamax negascout
- *  Sometime AI is dumb and does not prevent the opponent to place more symbols near each other
- * 	Use try catch to immediately stop minimax when timeout found
- */
-
-public class ZobristPlayer implements MNKPlayer {
+public class IterativeDeepZob implements MNKPlayer {
 
 	private MNKBoard B;
 	private MNKCellState myState;
@@ -27,7 +20,7 @@ public class ZobristPlayer implements MNKPlayer {
 	/**
    * Default empty constructor
    */
-	public ZobristPlayer() {
+	public IterativeDeepZob() {
 	}
 
 	public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
@@ -126,34 +119,36 @@ public class ZobristPlayer implements MNKPlayer {
 		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
 		//Cycle through all possible cells
-		for(MNKCell d : FC) {
+		for(int i = 1; !utility.isTimeExpiring(); ++i){
+			for(MNKCell d : FC) {
 
-			//Mark this cell as player move (temp)
-			B.markCell(d.i, d.j);
+				//Mark this cell as player move (temp)
+				B.markCell(d.i, d.j);
 
-			//Apply minimax algorithm on the cell
-            Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 0);
+				//Apply negamax algorithm on the cell
+				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i);
 
-			//DEBUG
-			Debug.PrintMiddleCicle(B, d, MoveVal);
+				//DEBUG
+				Debug.PrintMiddleCicle(B, d, MoveVal);
 
-			//Rollback
-			B.unmarkCell();
+				//Rollback
+				B.unmarkCell();
 
-			//Check if found a better move
-			if(MoveVal > MaxMoveValue){
-				MaxMoveValue = MoveVal;
-				BestMove = d;
+				//Check if found a better move
+				if(MoveVal > MaxMoveValue){
+					MaxMoveValue = MoveVal;
+					BestMove = d;
+				}
+
+				//Check timeout
+				if(utility.isTimeExpiring())
+				{
+					Debug.SolvedGame = false;
+					break;
+				}
+				else
+				utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 			}
-
-			//Check timeout
-			if(utility.isTimeExpiring())
-			{
-				Debug.SolvedGame = false;
-				break;
-			}
-			else
-			utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 		}
 
 		//Select center cell as first move (placed here to do computation and fill hashtable anyway before first move)
@@ -190,7 +185,7 @@ public class ZobristPlayer implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-    public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth){
+	public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth){
 
 		//DEBUG
 		Debug.IncreaseEvaluations();
@@ -311,7 +306,7 @@ public class ZobristPlayer implements MNKPlayer {
     }
 
 	public String playerName() {
-		return "Zob";
+		return "IterativeZob";
 	}
 }
 
