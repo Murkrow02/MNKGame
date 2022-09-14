@@ -1,5 +1,7 @@
 package mnkgame;
 
+import javax.swing.plaf.synth.SynthStyle;
+
 import mnkgame.*;
 
 public class NegaMax  implements MNKPlayer {
@@ -67,7 +69,7 @@ public class NegaMax  implements MNKPlayer {
 			B.markCell(d.i, d.j);
 
 			//Apply minimax algorithm on the cell
-            Integer MoveVal = -negaMax(-1);
+            Integer MoveVal = -negaMax(-1, Integer.MAX_VALUE, Integer.MIN_VALUE);
 
 			B.unmarkCell();
 
@@ -99,7 +101,7 @@ public class NegaMax  implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-    public Integer negaMax(int sign){
+    public Integer negaMax(int sign, int alpha, int beta){
 
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring())// || depth == 0)
@@ -120,12 +122,14 @@ public class NegaMax  implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Recursively call minmax on this board scenario
-				Integer boardValue = -negaMax(-sign);
+				bestValue = Math.max(bestValue, -negaMax(-sign, -alpha, -beta));
+				alpha = Math.max(alpha, bestValue);
 
 				//Revert move 
 				B.unmarkCell();
-
-				bestValue = Math.max(bestValue, boardValue);
+		
+				if(alpha >= beta)
+					break;
 			}
 
 			//Return the best value obtained

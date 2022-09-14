@@ -1,11 +1,14 @@
 package mnkgame;
 
 import mnkgame.*;
+
 public class Utility {
 
     public MNKGameState myWin;
     public MNKGameState yourWin;
-    private final int MAX_VALUE = 10;
+	public MNKCellState myMark;
+    public MNKCellState yourMark;
+    private final int MAX_VALUE = 100;
     public long timerStart = 0;
     public int TIMEOUT;
 	public double DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE=90;
@@ -30,15 +33,69 @@ public class Utility {
 	// try to use more values such as 0.5 if the move is making 2/3 marks lined up and player is going to win (opposite for adversary)
     public int evaluateBoard(MNKBoard B, int depth) {
 
-        // Game over
+        //Immediately return if gameover
         if (B.gameState() == myWin)
             return MAX_VALUE;// + depth;
         else if (B.gameState() == yourWin)
             return -MAX_VALUE;// - depth;
 
-        // Draw or not defined
-        return 0;
+
+		int ourWins = 0;
+		int hisWins = 0;
+
+		//Check rows
+		if(B.M >= B.K) //Only if can win on rows
+		{
+			for(int i = 0; i < B.N; i++){
+
+				int WE_OK = 0;
+				int HIM_OK = 0;
+				for(int j = 0; j < B.M; j++){
+
+					//WE
+					if(B.B[i][j] == yourMark)
+						WE_OK = 0; //Opponent sign on this cell, reset
+					else
+						WE_OK++; //Free or our sign, can go on
+
+					//HIM
+					if(B.B[i][j] == myMark)
+						HIM_OK = 0; //Our sign on this cell, reset
+					else
+						HIM_OK++; //Free or his sign, can go on
+
+					//Evaluations
+					if(WE_OK == 3){
+						ourWins++; //We found a possible win
+						WE_OK = 0;
+					}
+					if(HIM_OK == 3)
+					{
+						hisWins++; //He found a possible win
+						HIM_OK = 0;
+					}
+
+					//Check if no need to go further
+					int left_until_end = B.M-j; //How many spaces until end of row
+					if(left_until_end+WE_OK<B.K && left_until_end+HIM_OK<B.K){
+
+						//Neither us nor him can win on this row, no need to go further
+						continue;
+					}
+
+				}
+			}
+		}
+
+		
+			Debug.printGameState(B);
+			System.out.println(ourWins);
+			System.out.println(hisWins);
+		
+		int points = ourWins-hisWins;
+        return points;
     }
+
 
     //Return the only cell to select to prevent immediate loss if possible
 	public MNKCell checkImmediateLoss(MNKBoard B){

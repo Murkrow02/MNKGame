@@ -1,13 +1,14 @@
 package mnkgame;
 
+import java.io.Console;
 import java.util.Hashtable;
+import java.util.concurrent.TimeoutException;
+
 import mnkgame.*;
 
 public class IterativeDeepZob implements MNKPlayer {
 
 	private MNKBoard B;
-	private MNKCellState myState;
-	private MNKCellState yourState;
 	private boolean meFirst;
 	private Utility utility;
 
@@ -34,15 +35,15 @@ public class IterativeDeepZob implements MNKPlayer {
 		utility.myWin   = first ? MNKGameState.WINP1 : MNKGameState.WINP2; 
 		utility.yourWin = first ? MNKGameState.WINP2 : MNKGameState.WINP1;
 
+		//How the cells are marked in this match
+		utility.myMark = first ? MNKCellState.P1 : MNKCellState.P2;
+		utility.yourMark = first ? MNKCellState.P2 : MNKCellState.P1;
+
 		//Save if we are the first player
 		meFirst = first;
 
 		//If the function takes longer than the set timeout an exception is thrown
 		utility.TIMEOUT = timeout_in_secs;	
-
-		//How the cells are marked in this match
-		myState = meFirst ? MNKCellState.P1 : MNKCellState.P2;
-		yourState = meFirst ? MNKCellState.P2 : MNKCellState.P1;
 
 		//Initialize Zobrist table
 		ZT = new ZobristTable(M,N);
@@ -85,48 +86,27 @@ public class IterativeDeepZob implements MNKPlayer {
 
 		//DEBUG
 		Debug.Reset();
-
-		//If found the best move possible (immediate win) return immediately
-		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-1))){
-
-			//Check if immediate win is possible
-			MNKCell ImmediateWinCell = utility.checkImmediateWin(B);
-
-			//Exit the loop if found way not to lose
-			if(ImmediateWinCell != null){
-
-				//Update local board with this move
-				B.markCell(ImmediateWinCell.i, ImmediateWinCell.j); 
-
-				//DEBUG
-				Debug.FoundEnd(true);
-
-				return ImmediateWinCell;
-			}
-		}
-
-		//Return immediately by intercepting player2 winning move before he does
-		MNKCell PreventLossCell = null;
 		
-		//Check if there are already enough symbols placed for player2 to reach victory
-		if((meFirst && MC.length >= (B.K*2-2)) || (!meFirst && MC.length >= (B.K*2-3))){
+		/*
+		 * Note: is not needed anymore to search for immediate win/loss becaouse with 
+		 * iterative deepening we always find immediately a winning/losing position,
+		 */
 
-			//Check if immediate loss is possible
-			PreventLossCell = utility.checkImmediateLoss(B);
-		}
-		
-
-		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
+		/*CANNOT IMMEDIATELY WIN, PROCEED WITH ITERATIVEDEEPENING*/
 
 		//Cycle through all possible cells
-		for(int i = 1; !utility.isTimeExpiring(); ++i){
+		//for(int i = 1; !utility.isTimeExpiring(); ++i){
+
 			for(MNKCell d : FC) {
 
 				//Mark this cell as player move (temp)
 				B.markCell(d.i, d.j);
 
 				//Apply negamax algorithm on the cell
-				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i);
+				Integer MoveVal = 0;
+				try{
+					MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 1);
+				}catch(TimeoutException ex){}
 
 				//DEBUG
 				Debug.PrintMiddleCicle(B, d, MoveVal);
@@ -146,10 +126,8 @@ public class IterativeDeepZob implements MNKPlayer {
 					Debug.SolvedGame = false;
 					break;
 				}
-				else
-				utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 			}
-		}
+		//}
 
 		//Select center cell as first move (placed here to do computation and fill hashtable anyway before first move)
 		if(MC.length == 0){
@@ -164,17 +142,6 @@ public class IterativeDeepZob implements MNKPlayer {
 			return MiddleCell;
 		}
 
-		/*Select cell that would make the opponent win as is for sure the best move 
-			(placed here to do computation and fill hashtable anyway)*/
-		if(PreventLossCell != null){
-			
-			//DEBUG
-			Debug.FoundEnd(false);
-			Debug.PrintSummary();
-
-			B.markCell(PreventLossCell.i, PreventLossCell.j); //Update local board with this move
-			return PreventLossCell;
-		}
 
 		//Return the result
 		B.markCell(BestMove.i, BestMove.j); //Update local board with this move
@@ -185,18 +152,18 @@ public class IterativeDeepZob implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-	public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth){
+	public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth)throws TimeoutException{
 
 		//DEBUG
 		Debug.IncreaseEvaluations();
 
-		/*Each time we enter a recursive call, timeout should trigger 
-		* a little bit earlier as we need to rollback all calls on stack when first triggered
-		*/
-		utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.5);
+		//Immediately stop if we are running out of time
+		if(utility.isTimeExpiring()){
+			throw new TimeoutException();
+		}
 
 		//Base case, evaluation detected gameover or timeout soon
-		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring())// || depth == 0)
+		if(B.gameState() != MNKGameState.OPEN || depth <= 0)
 		{
 			//if(depth == 0)
 			//	System.err.println("Depth reached 0");
@@ -218,7 +185,7 @@ public class IterativeDeepZob implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, myState) : ZT.computeHash(B);
+				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
 				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
 
 				//Already evaluated this game state
@@ -267,7 +234,7 @@ public class IterativeDeepZob implements MNKPlayer {
 				B.markCell(current.i, current.j);
 
 				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, yourState) : ZT.computeHash(B);
+				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.yourMark) : ZT.computeHash(B);
 				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
 				
 				//Already evaluated this state
