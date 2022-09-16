@@ -29,8 +29,7 @@ public class Utility {
         return result;
     }
 
-    //IDEA: at the beginning implement a normal minimax algorithm with 1 win 0 lose, next
-	// try to use more values such as 0.5 if the move is making 2/3 marks lined up and player is going to win (opposite for adversary)
+
     public int evaluateBoard(MNKBoard B, int depth) {
 
         //Immediately return if gameover
@@ -40,61 +39,66 @@ public class Utility {
             return -MAX_VALUE;// - depth;
 
 
+		return 0;
+    }
+
+	public int evaluateBoard2(MNKBoard B, WinCounters counters){
+		
 		int ourWins = 0;
 		int hisWins = 0;
 
-		//Check rows
-		if(B.M >= B.K) //Only if can win on rows
-		{
-			for(int i = 0; i < B.N; i++){
+		//Start from scratch, set all win counters by evaluating all cells they control
+		for (var counter : counters.WinCounters) {
 
-				int WE_OK = 0;
-				int HIM_OK = 0;
-				for(int j = 0; j < B.M; j++){
+			int P1_OK = 0;
+			int P2_OK = 0;
 
-					//WE
-					if(B.B[i][j] == yourMark)
-						WE_OK = 0; //Opponent sign on this cell, reset
-					else
-						WE_OK++; //Free or our sign, can go on
+			//Empty counter
+			if(counter.CellsToCheck == null)
+				continue;
 
-					//HIM
-					if(B.B[i][j] == myMark)
-						HIM_OK = 0; //Our sign on this cell, reset
-					else
-						HIM_OK++; //Free or his sign, can go on
+			//Check all the cells controlled by this WinCounter
+			for (var cellToCheck : counter.CellsToCheck) {
+				
+				//P1 count
+				if(B.B[cellToCheck.i][cellToCheck.j] == MNKCellState.P2)
+					P1_OK = 0; //P2 sign on this cell, reset
+				else
+					P1_OK++; //Free or P1 sign, can go on
 
-					//Evaluations
-					if(WE_OK == 3){
-						ourWins++; //We found a possible win
-						WE_OK = 0;
-					}
-					if(HIM_OK == 3)
-					{
-						hisWins++; //He found a possible win
-						HIM_OK = 0;
-					}
+				//P2 count
+				if(B.B[cellToCheck.i][cellToCheck.j] == MNKCellState.P1)
+					P2_OK = 0; //P1 sign on this cell, reset
+				else
+					P2_OK++; //Free or P2 sign, can go on
 
-					//Check if no need to go further
-					int left_until_end = B.M-j; //How many spaces until end of row
-					if(left_until_end+WE_OK<B.K && left_until_end+HIM_OK<B.K){
-
-						//Neither us nor him can win on this row, no need to go further
-						continue;
-					}
-
+				//Evaluations
+				if(P1_OK == B.K){
+					counter.P1Wins++; //We found a possible win
+					P1_OK = 0;
 				}
+				if(P2_OK == B.K)
+				{
+					counter.P2Wins++; //He found a possible win
+					P2_OK = 0;
+				}
+
+				//Check if no need to go further (implement later by saving cell controlled count and incrementing local variable)
+				// int left_until_end = B.M-j; //How many spaces until end of row
+				// if(left_until_end+WE_OK<B.K && left_until_end+HIM_OK<B.K){
+
+				// 	//Neither us nor him can win on this row, no need to go further
+				// 	continue;
+				// }
 			}
 		}
 
-		
-			Debug.printGameState(B);
-			System.out.println(ourWins);
-			System.out.println(hisWins);
-		
-		int points = ourWins-hisWins;
-        return points;
-    }
+			
+		Debug.printGameState(B);
+		System.out.println(counters.Score(true));
+
+        return 0;
+	}
 
 
     //Return the only cell to select to prevent immediate loss if possible

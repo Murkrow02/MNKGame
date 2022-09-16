@@ -6,7 +6,7 @@ import java.util.concurrent.TimeoutException;
 
 import mnkgame.*;
 
-public class IterativeDeepZob implements MNKPlayer {
+public class TestZob implements MNKPlayer {
 
 	private MNKBoard B;
 	private boolean meFirst;
@@ -16,12 +16,18 @@ public class IterativeDeepZob implements MNKPlayer {
 	   by the game board hashing function to create a unique hash of 
 	   each possible game state
 	*/
-	public ZobristTable ZT;
+	private ZobristTable ZT;
+
+	/*
+	 * Custom class used to keep track of all possible wins/loss
+	 * on every row, column or diagonal, mainly used for evaluation
+	 */
+	private WinCounters WinCounters;
 
 	/**
    * Default empty constructor
    */
-	public IterativeDeepZob() {
+	public TestZob() {
 	}
 
 	public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
@@ -58,6 +64,9 @@ public class IterativeDeepZob implements MNKPlayer {
 
 		//Init hashtable with desired size
 		ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
+
+		//Init wincounters
+		WinCounters = new WinCounters(B);
 	}
 
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
@@ -152,7 +161,7 @@ public class IterativeDeepZob implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-	public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth)throws TimeoutException{
+	public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth) throws TimeoutException{
 
 		//DEBUG
 		Debug.IncreaseEvaluations();
@@ -167,7 +176,7 @@ public class IterativeDeepZob implements MNKPlayer {
 		{
 			//if(depth == 0)
 			//	System.err.println("Depth reached 0");
-			return utility.evaluateBoard(B, depth);
+			return utility.evaluateBoard2(B, WinCounters);
 		}
 
 		//Our turn (Maximizing)
