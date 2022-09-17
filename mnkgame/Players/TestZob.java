@@ -9,7 +9,6 @@ import mnkgame.*;
 public class TestZob implements MNKPlayer {
 
 	private MNKBoard B;
-	private boolean meFirst;
 	private Utility utility;
 
 	/* This tri-dimensional array stores M*N random values, is used 
@@ -46,7 +45,7 @@ public class TestZob implements MNKPlayer {
 		utility.yourMark = first ? MNKCellState.P2 : MNKCellState.P1;
 
 		//Save if we are the first player
-		meFirst = first;
+		utility.meFirst = first;
 
 		//If the function takes longer than the set timeout an exception is thrown
 		utility.TIMEOUT = timeout_in_secs;	
@@ -114,7 +113,7 @@ public class TestZob implements MNKPlayer {
 				//Apply negamax algorithm on the cell
 				Integer MoveVal = 0;
 				try{
-					MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 1);
+					MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 100);
 				}catch(TimeoutException ex){}
 
 				//DEBUG
@@ -122,6 +121,7 @@ public class TestZob implements MNKPlayer {
 
 				//Rollback
 				B.unmarkCell();
+				WinCounters.Reset();
 
 				//Check if found a better move
 				if(MoveVal > MaxMoveValue){
@@ -175,7 +175,7 @@ public class TestZob implements MNKPlayer {
 		if(B.gameState() != MNKGameState.OPEN || depth <= 0)
 		{
 			//if(depth == 0)
-			//	System.err.println("Depth reached 0");
+			//System.err.println(depth);
 			return utility.evaluateBoard2(B, WinCounters);
 		}
 
