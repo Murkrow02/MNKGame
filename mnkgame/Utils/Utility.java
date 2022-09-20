@@ -9,7 +9,7 @@ public class Utility {
 	public MNKCellState myMark;
 	public MNKCellState yourMark;
 	public boolean meFirst;
-	private final int MAX_VALUE = 100;
+	private final int MAX_VALUE = Integer.MAX_VALUE;
 	public long timerStart = 0;
 	public int TIMEOUT;
 	public double DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE = 90;

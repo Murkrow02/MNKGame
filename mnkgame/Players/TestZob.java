@@ -103,7 +103,7 @@ public class TestZob implements MNKPlayer {
 			B.markCell(d.i, d.j);
 
 			//Apply minimax algorithm on the cell
-            Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 0, Counters);
+            Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 4, Counters);
 
 			//DEBUG
 			Debug.PrintMiddleCicle(B, d, MoveVal);
@@ -147,7 +147,7 @@ public class TestZob implements MNKPlayer {
 		utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.5);
 
 		//Base case, evaluation detected gameover or timeout soon
-		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring())// || depth == 0)
+		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
 		{
 			//if(depth == 0)
 			//	System.err.println("Depth reached 0");
