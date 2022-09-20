@@ -96,9 +96,9 @@ public class Utility {
 
 		}
 
-		//Debug.printGameState(B);
-		//System.out.println(counters.ScoreP1());
-		//System.out.println(counters.ScoreP2());
+		Debug.printGameState(B);
+		System.out.println(counters.ScoreP1());
+		System.out.println(counters.ScoreP2());
 
 		return counters.Score(meFirst);
 	}

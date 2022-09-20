@@ -1,10 +1,14 @@
 package mnkgame;
 
-import java.io.Console;
 import java.util.Hashtable;
-import java.util.concurrent.TimeoutException;
-
 import mnkgame.*;
+
+/*
+ * TODO: Insert all possible win/loss already in hash table
+ *  Negamax negascout
+ *  Sometime AI is dumb and does not prevent the opponent to place more symbols near each other
+ * 	Use try catch to immediately stop minimax when timeout found
+ */
 
 public class TestZob implements MNKPlayer {
 
@@ -15,13 +19,9 @@ public class TestZob implements MNKPlayer {
 	   by the game board hashing function to create a unique hash of 
 	   each possible game state
 	*/
-	private ZobristTable ZT;
+	public ZobristTable ZT;
 
-	/*
-	 * Custom class used to keep track of all possible wins/loss
-	 * on every row, column or diagonal, mainly used for evaluation
-	 */
-	private WinCounters WinCounters;
+	public WinCounters Counters;
 
 	/**
    * Default empty constructor
@@ -40,15 +40,15 @@ public class TestZob implements MNKPlayer {
 		utility.myWin   = first ? MNKGameState.WINP1 : MNKGameState.WINP2; 
 		utility.yourWin = first ? MNKGameState.WINP2 : MNKGameState.WINP1;
 
-		//How the cells are marked in this match
-		utility.myMark = first ? MNKCellState.P1 : MNKCellState.P2;
-		utility.yourMark = first ? MNKCellState.P2 : MNKCellState.P1;
-
 		//Save if we are the first player
 		utility.meFirst = first;
 
 		//If the function takes longer than the set timeout an exception is thrown
 		utility.TIMEOUT = timeout_in_secs;	
+
+		//How the cells are marked in this match
+		utility.myMark = utility.meFirst ? MNKCellState.P1 : MNKCellState.P2;
+		utility.yourMark = utility.meFirst ? MNKCellState.P2 : MNKCellState.P1;
 
 		//Initialize Zobrist table
 		ZT = new ZobristTable(M,N);
@@ -64,8 +64,7 @@ public class TestZob implements MNKPlayer {
 		//Init hashtable with desired size
 		ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
 
-		//Init wincounters
-		WinCounters = new WinCounters(B);
+		Counters = new WinCounters(B);
 	}
 
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
@@ -94,63 +93,39 @@ public class TestZob implements MNKPlayer {
 
 		//DEBUG
 		Debug.Reset();
-		
-		/*
-		 * Note: is not needed anymore to search for immediate win/loss becaouse with 
-		 * iterative deepening we always find immediately a winning/losing position,
-		 */
 
-		/*CANNOT IMMEDIATELY WIN, PROCEED WITH ITERATIVEDEEPENING*/
+		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
 		//Cycle through all possible cells
-		//for(int i = 1; !utility.isTimeExpiring(); ++i){
+		for(MNKCell d : FC) {
 
-			for(MNKCell d : FC) {
+			//Mark this cell as player move (temp)
+			B.markCell(d.i, d.j);
 
-				//Mark this cell as player move (temp)
-				B.markCell(d.i, d.j);
-
-				//Apply negamax algorithm on the cell
-				Integer MoveVal = 0;
-				try{
-					MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 100);
-				}catch(TimeoutException ex){}
-
-				//DEBUG
-				Debug.PrintMiddleCicle(B, d, MoveVal);
-
-				//Rollback
-				B.unmarkCell();
-				WinCounters.Reset();
-
-				//Check if found a better move
-				if(MoveVal > MaxMoveValue){
-					MaxMoveValue = MoveVal;
-					BestMove = d;
-				}
-
-				//Check timeout
-				if(utility.isTimeExpiring())
-				{
-					Debug.SolvedGame = false;
-					break;
-				}
-			}
-		//}
-
-		//Select center cell as first move (placed here to do computation and fill hashtable anyway before first move)
-		if(MC.length == 0){
-
-			//Calculate and mark middle cell
-			MNKCell MiddleCell = new MNKCell(B.M/2, B.N/2);
-			B.markCell(MiddleCell.i, MiddleCell.j);
+			//Apply minimax algorithm on the cell
+            Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 0, Counters);
 
 			//DEBUG
-			Debug.PrintSummary();
+			Debug.PrintMiddleCicle(B, d, MoveVal);
 
-			return MiddleCell;
+			//Rollback
+			B.unmarkCell();
+
+			//Check if found a better move
+			if(MoveVal > MaxMoveValue){
+				MaxMoveValue = MoveVal;
+				BestMove = d;
+			}
+
+			//Check timeout
+			if(utility.isTimeExpiring())
+			{
+				Debug.SolvedGame = false;
+				break;
+			}
+			else
+			utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 		}
-
 
 		//Return the result
 		B.markCell(BestMove.i, BestMove.j); //Update local board with this move
@@ -161,22 +136,22 @@ public class TestZob implements MNKPlayer {
 		return BestMove; //Update game board
 	}
 
-	public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth) throws TimeoutException{
+    public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth, WinCounters counters){
 
 		//DEBUG
 		Debug.IncreaseEvaluations();
 
-		//Immediately stop if we are running out of time
-		if(utility.isTimeExpiring()){
-			throw new TimeoutException();
-		}
+		/*Each time we enter a recursive call, timeout should trigger 
+		* a little bit earlier as we need to rollback all calls on stack when first triggered
+		*/
+		utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE - (depth * 0.5);
 
 		//Base case, evaluation detected gameover or timeout soon
-		if(B.gameState() != MNKGameState.OPEN || depth <= 0)
+		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring())// || depth == 0)
 		{
 			//if(depth == 0)
-			//System.err.println(depth);
-			return utility.evaluateBoard2(B, WinCounters);
+			//	System.err.println("Depth reached 0");
+			return utility.evaluateBoard2(B, counters);
 		}
 
 		//Our turn (Maximizing)
@@ -188,7 +163,6 @@ public class TestZob implements MNKPlayer {
 			//Cycle through all possible moves
 			MNKCell FC[] = B.getFreeCells();
 			for(MNKCell current : FC) {
-
 				
 				//Mark this cell as player move
 				B.markCell(current.i, current.j);
@@ -203,7 +177,7 @@ public class TestZob implements MNKPlayer {
 				}
 				else{
 					//Recursively call minmax on this board scenario
-					boardValue = miniMax(false, alpha, beta, boardHash, depth--);
+					boardValue = miniMax(false, alpha, beta, boardHash, depth--, counters);
 
 					//Add current value to HashSet for future use
 					ZT.EvaluatedStates.put(boardHash, boardValue);	
@@ -252,7 +226,7 @@ public class TestZob implements MNKPlayer {
 				} else{
 
 					//Recursively call minmax on this board scenario
-					boardValue = miniMax(true, alpha, beta, boardHash, depth--);
+					boardValue = miniMax(true, alpha, beta, boardHash, depth--, counters);
 
 					//Add current value to HashSet for future use
 					ZT.EvaluatedStates.put(boardHash, boardValue);	
@@ -282,7 +256,7 @@ public class TestZob implements MNKPlayer {
     }
 
 	public String playerName() {
-		return "IterativeZob";
+		return "TestZob";
 	}
 }
 
