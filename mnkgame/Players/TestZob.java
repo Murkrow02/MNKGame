@@ -107,7 +107,7 @@ public class TestZob implements MNKPlayer {
 				Counters.UpdateAllCounters(B);
 				
 				//Apply minimax algorithm on the cell
-				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 1, d);
+				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 10, d);
 
 				//DEBUG
 				Debug.PrintMiddleCicle(B, d, MoveVal);
@@ -169,6 +169,7 @@ public class TestZob implements MNKPlayer {
 				//Mark this cell as player move
 				B.markCell(current.i, current.j);
 
+				//Update wincounters affected by this move 
 				utility.updateWinCounters(B, Counters, current);
 
 				//Check if already evaluated this game state
@@ -192,6 +193,9 @@ public class TestZob implements MNKPlayer {
 
 				//Undo the move
 				B.unmarkCell();
+				
+				//Restore wincounters before this move
+				utility.updateWinCounters(B, Counters, current);
 
 				//Check if found better value
 				MaxValue = Math.max(MaxValue, boardValue);	
@@ -220,6 +224,7 @@ public class TestZob implements MNKPlayer {
 				//Mark this cell as player move
 				B.markCell(current.i, current.j);
 
+				//Update wincounters affected by this move 
 				utility.updateWinCounters(B, Counters, current);
 
 				//Check if already evaluated this game state
@@ -243,6 +248,9 @@ public class TestZob implements MNKPlayer {
 
 				//Undo the move
 				B.unmarkCell();
+
+				//Restore wincounters before this move
+				utility.updateWinCounters(B, Counters, current);
 
 				//Check if found better value
 				MinValue = Math.min(MinValue, boardValue);	

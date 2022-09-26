@@ -51,10 +51,13 @@ public class Utility {
 			return -MAX_VALUE;// - depth;
 
 		Debug.printGameState(B);
-		System.out.println(counters.ScoreP1());
-		System.out.println(counters.ScoreP2());
+		System.out.println("");
+		System.out.println("P1: " + counters.ScoreP1());
+		System.out.println("P2: " + counters.ScoreP2());
 
-		return counters.Score(meFirst);
+		int Score = counters.Score(meFirst);
+		System.out.println("E: " + Score);
+		return Score;
 	}
 
 	public void updateWinCounters(MNKBoard B, WinCounters counters, MNKCell lastMove){
