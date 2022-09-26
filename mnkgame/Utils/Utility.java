@@ -1,6 +1,7 @@
 package mnkgame;
 
 import mnkgame.*;
+import java.util.*;
 
 public class Utility {
 
@@ -49,58 +50,27 @@ public class Utility {
 		else if (B.gameState() == yourWin)
 			return -MAX_VALUE;// - depth;
 
-		// Start from scratch, set all win counters by evaluating all cells they control
-		for (var counter : counters.Counters) {
-
-			int P1_OK = 0;
-			int P2_OK = 0;
-
-			// Empty counter
-			if (counter.CellsToCheck == null)
-				continue;
-
-			// Check all the cells controlled by this WinCounter
-			for (var cellToCheck : counter.CellsToCheck) {
-
-				// P1 count
-				if (B.B[cellToCheck.i][cellToCheck.j] == MNKCellState.P2)
-					P1_OK = 0; // P2 sign on this cell, reset
-				else
-					P1_OK++; // Free or P1 sign, can go on
-
-				// P2 count
-				if (B.B[cellToCheck.i][cellToCheck.j] == MNKCellState.P1)
-					P2_OK = 0; // P1 sign on this cell, reset
-				else
-					P2_OK++; // Free or P2 sign, can go on
-
-				// Evaluations
-				if (P1_OK == B.K) {
-					counter.P1Wins++; // We found a possible win
-					P1_OK = 0;
-				}
-				if (P2_OK == B.K) {
-					counter.P2Wins++; // He found a possible win
-					P2_OK = 0;
-				}
-
-				// Check if no need to go further (implement later by saving cell controlled
-				// count and incrementing local variable)
-				// int left_until_end = B.M-j; //How many spaces until end of row
-				// if(left_until_end+WE_OK<B.K && left_until_end+HIM_OK<B.K){
-
-				// //Neither us nor him can win on this row, no need to go further
-				// continue;
-				// }
-			}
-
-		}
-
 		Debug.printGameState(B);
 		System.out.println(counters.ScoreP1());
 		System.out.println(counters.ScoreP2());
 
 		return counters.Score(meFirst);
+	}
+
+	public void updateWinCounters(MNKBoard B, WinCounters counters, MNKCell lastMove){
+
+		//Some counters are already set and we have access to last move, continue by analyzing only affected win counters
+		LinkedList<Integer> CountersReferences = counters.CountersAffectedByMove(lastMove); //All the wincounters affected by this move 
+		
+		//System.out.println("###");
+		//System.out.println(lastMove.i + " " + lastMove.j + ":");
+		for(var index : CountersReferences){	
+			//System.out.println("Counter:" + index);
+			//for(var controlled : counters.Counters[index].CellsToCheck){
+			//	System.out.println(controlled.i +  " " + controlled.j);
+			//}	
+			counters.Counters[index].updateCounterWins(B);
+		}
 	}
 
 	// Return the only cell to select to prevent immediate loss if possible

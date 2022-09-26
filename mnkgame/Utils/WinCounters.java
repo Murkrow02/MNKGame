@@ -108,6 +108,16 @@ public class WinCounters {
         }
     }
 
+    public void UpdateAllCounters(MNKBoard B){
+        for(var counter : Counters){
+            counter.updateCounterWins(B);
+        }
+    }
+
+    public LinkedList<Integer> CountersAffectedByMove(MNKCell move){
+        return WinCountersReferences.get(move.i).get(move.j);
+    }
+
     public void Reset(){
 
         //Reset all counters to 0
