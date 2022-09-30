@@ -5,6 +5,10 @@ import java.util.*;
 
 public class WinCounters {
     
+    //Save here total wins to prevent cicling each time on array to get exact scores
+    public int TotalP1Wins = 0;
+    public int TotalP2Wins = 0;
+
     public WinCounter[] Counters; 
     public ArrayList<ArrayList<LinkedList<Integer>>> WinCountersReferences;
 
@@ -108,9 +112,20 @@ public class WinCounters {
         }
     }
 
-    public void UpdateAllCounters(MNKBoard B){
+    public void UpdateAllCounters(MNKBoard B){  
+
+        //Reset total win (we are going to start from scratch)
+        TotalP1Wins = 0;
+        TotalP2Wins = 0;
+
         for(var counter : Counters){
+
+            //Keep track of wins on this counter            
             counter.updateCounterWins(B);
+
+            //Update total wins adding those tracked by this counter
+			TotalP1Wins+=counter.P1Wins;
+			TotalP2Wins+=counter.P2Wins;
         }
     }
 
@@ -118,57 +133,16 @@ public class WinCounters {
         return WinCountersReferences.get(move.i).get(move.j);
     }
 
-    public void Reset(){
+    // public void Reset(){
 
-        //Reset all counters to 0
-        for (WinCounter counter : Counters) {
-            counter.P1Wins = 0;
-            counter.P2Wins = 0;
-            counter.Full = false;
-        }
-    }
-
-    public int Score(boolean weAreP1){
-
-        int P1Score = 0;
-        int P2Score = 0;
-        for (WinCounter winCounter : Counters) {
-            P1Score+=winCounter.P1Wins;
-            P2Score+=winCounter.P2Wins;
-        }
-
-        if(weAreP1)
-            return P1Score-P2Score;
-        else
-            return P2Score-P1Score;
-    }
-
-    public int ScoreP1(){
-
-        int P1Score = 0;
-        for (WinCounter winCounter : Counters) {
-            P1Score+=winCounter.P1Wins;
-        }
-
-        return P1Score;
-    }
-
-    public int ScoreP2(){
-
-        int P2Score = 0;
-        for (WinCounter winCounter : Counters) {
-            P2Score+=winCounter.P2Wins;
-        }
-
-        return P2Score;
-    }
-
-    public WinCounters Copy(){
-        
-        WinCounters newCopy = new WinCounters();
-        newCopy.Counters = Arrays.copyOf(Counters, Counters.length);;
-        //newCopy.WinCountersReferences = WinCountersReferences;
-        return newCopy;
-    }
+    //     //Reset all counters to 0
+    //     for (WinCounter counter : Counters) {
+    //         TotalP1Wins = 0;
+    //         TotalP2Wins = 0;
+    //         counter.P1Wins = 0;
+    //         counter.P2Wins = 0;
+    //         counter.Full = false;
+    //     }
+    // }
 
 }

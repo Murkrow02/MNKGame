@@ -67,7 +67,11 @@ public class TestZob implements MNKPlayer {
 		Counters = new WinCounters(B);
 	}
 
+	public Integer FreeCells;
+	public Integer ReachedLeaf = 0;
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
+
+		FreeCells = FC.length;
 
 		//Start timer
 		utility.timerStart = System.currentTimeMillis();
@@ -96,8 +100,8 @@ public class TestZob implements MNKPlayer {
 
 		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
-		//Cycle through all possible cells
-		//for(int i = 0; !utility.isTimeExpiring(); ++i){
+		//Iterative deep, increase depth each time until timeout
+		for(int i = 0; !utility.isTimeExpiring(); ++i){
 
 			for(MNKCell d : FC) {
 
@@ -107,7 +111,7 @@ public class TestZob implements MNKPlayer {
 				Counters.UpdateAllCounters(B);
 				
 				//Apply minimax algorithm on the cell
-				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, 10, d);
+				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
 
 				//DEBUG
 				Debug.PrintMiddleCicle(B, d, MoveVal);
@@ -128,10 +132,14 @@ public class TestZob implements MNKPlayer {
 					break;
 				}
 				else
-				utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
+				utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger					
 			}
 			
-		//}
+			//if(ReachedLeaf >= FreeCells)
+			//	break;
+
+			//System.out.println(ReachedLeaf);
+		}
 		
 
 		//Return the result
@@ -150,9 +158,7 @@ public class TestZob implements MNKPlayer {
 
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
-		{
-			//if(depth == 0)
-			//	System.err.println("Depth reached 0");
+		{			
 			return utility.evaluateBoard2(B, Counters);
 		}
 

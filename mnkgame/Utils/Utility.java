@@ -45,19 +45,62 @@ public class Utility {
 	public int evaluateBoard2(MNKBoard B, WinCounters counters) {
 
 		// Immediately return if gameover
-		if (B.gameState() == myWin)
-			return MAX_VALUE;// + depth;
+		if (B.gameState() == myWin) //Best case
+			return MAX_VALUE;
 		else if (B.gameState() == yourWin)
-			return -MAX_VALUE;// - depth;
+			return -MAX_VALUE; //Worst case
 
-		Debug.printGameState(B);
-		System.out.println("");
-		System.out.println("P1: " + counters.ScoreP1());
-		System.out.println("P2: " + counters.ScoreP2());
+		//Evaluate intermediate states
 
-		int Score = counters.Score(meFirst);
-		System.out.println("E: " + Score);
-		return Score;
+		//P1 is winning
+		if(counters.TotalP1Wins > 0 && counters.TotalP2Wins <= 0){
+
+			/*
+			We are P1, so we have a possible win but opponent does not
+			We cannot lose, worst case is a draw, second best case scenario after 100% win
+			*/
+			if(myMark == MNKCellState.P1){
+				return MAX_VALUE-1;
+			}
+
+			/*
+			We are P2 so there is no way we can win, we can at maximum achieve a draw
+			This is the second worst case scenario after 100% loss
+			 */
+			else{
+				return -MAX_VALUE+1;
+			}
+
+		}
+
+		//P2 is winning
+		if(counters.TotalP2Wins > 0 && counters.TotalP1Wins <= 0){
+
+			/*
+			We are P1 so there is no way we can win, we can at maximum achieve a draw
+			This is the second worst case scenario after 100% loss
+			 */
+			if(myMark == MNKCellState.P1){
+				return -MAX_VALUE+1;
+			}
+
+			/*
+			We are P2, so we have a possible win but opponent does not
+			We cannot lose, worst case is a draw, second best case scenario after 100% win
+			*/
+			else{
+				return MAX_VALUE-1;
+			}
+		}
+
+		/*
+		We cannot yet declare an intermediate state so return an evaluation which
+		summarises the current game state, by subtracting the opponent possible wins from ours
+		*/
+		if(meFirst)
+            return counters.TotalP1Wins-counters.TotalP2Wins;
+        else
+            return counters.TotalP2Wins-counters.TotalP1Wins; 
 	}
 
 	public void updateWinCounters(MNKBoard B, WinCounters counters, MNKCell lastMove){
@@ -67,12 +110,26 @@ public class Utility {
 		
 		//System.out.println("###");
 		//System.out.println(lastMove.i + " " + lastMove.j + ":");
+
+		//Cycle through counter which have been affected by this move
 		for(var index : CountersReferences){	
+
 			//System.out.println("Counter:" + index);
 			//for(var controlled : counters.Counters[index].CellsToCheck){
 			//	System.out.println(controlled.i +  " " + controlled.j);
 			//}	
+
+			//Wins counted by this counter need to be updated so refresh the total win count
+			counters.TotalP1Wins-=counters.Counters[index].P1Wins;
+			counters.TotalP2Wins-=counters.Counters[index].P2Wins;
+
+			//Now effectively search for new wins on this counter
 			counters.Counters[index].updateCounterWins(B);
+
+			//Update total wins on board after this move
+			counters.TotalP1Wins+=counters.Counters[index].P1Wins;
+			counters.TotalP2Wins+=counters.Counters[index].P2Wins;
+
 		}
 	}
 

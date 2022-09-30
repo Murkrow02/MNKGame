@@ -10,7 +10,6 @@ public class WinCounter{
     public boolean Full = false;
     public LinkedList<MNKCell> CellsToCheck;
 
-
     //Updates P1 and P2 wins on this counter by analyzing cells controlled by this counter
 	public void updateCounterWins(MNKBoard B){
 
