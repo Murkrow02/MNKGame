@@ -46,11 +46,11 @@ public class WinCounters {
         WinCountersReferences = new ArrayList<>(b.M);
 
         //Initialize lists for board cell references (used to immediately access matrixes to edit when a new piece is added)
-        for(int i = 0; i < b.N; i++){   
+        for(int i = 0; i < b.M; i++){   
             
-            WinCountersReferences.add(new ArrayList<LinkedList<Integer>>(b.N));
+            WinCountersReferences.add(new ArrayList<LinkedList<Integer>>(b.M));
 
-            for(int j = 0; j < b.M; j++){
+            for(int j = 0; j < b.N; j++){
                 WinCountersReferences.get(i).add(new LinkedList<Integer>());
             }
         }
