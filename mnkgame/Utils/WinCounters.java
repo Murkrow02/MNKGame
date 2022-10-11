@@ -107,7 +107,45 @@ public class WinCounters {
         //Diagonal matrixes
         if(Min_M_N >= b.K) //If can't win on diagonal there's no need to save possible wins
         {
+            int totalDiagonals = 0;
+            /*
+            Bruteforce every possible diagonal to find which are suitable for win and consequently
+            worth to save in a counter (there could have been a more elegant way but since this function
+            is only called once I'm lazy to find one)
+            */ 
 
+            //Top to down arrows
+
+            //Every diagonal starting from the first column, targeting the last row of the board
+            for(int i = b.M-1; i >= 0; i--){
+
+                //Save i index as it will be modified in the while loop
+                int old_i = i;
+
+                //Start each time from the first column
+                int j = 0;
+                
+                //Check if can place enough symbols to reach victory on this diagonal
+                int spaces_count = 0;
+                while(i < b.N && j < b.M){
+                    i++;
+                    j++;
+                    spaces_count++;
+                    System.out.println(i);
+                    System.out.println(j);
+                }
+
+                //If we can place at least k symbols on this column then there is enough space to reach victory
+                boolean enough_space = spaces_count >= b.K;
+
+                if(enough_space)
+                    totalDiagonals++;
+
+                //Restore i that was modified in the while loop
+                i = old_i;
+            }
+
+            System.out.println("Totale diagonali: " + totalDiagonals);
             
         }
     }

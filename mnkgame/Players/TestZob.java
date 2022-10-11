@@ -64,14 +64,11 @@ public class TestZob implements MNKPlayer {
 		//Init hashtable with desired size
 		ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
 
+		//Initialize wincounters and respective cell references
 		Counters = new WinCounters(B);
 	}
 
-	public Integer FreeCells;
-	public Integer ReachedLeaf = 0;
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
-
-		FreeCells = FC.length;
 
 		//Start timer
 		utility.timerStart = System.currentTimeMillis();
@@ -159,6 +156,8 @@ public class TestZob implements MNKPlayer {
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
 		{			
+			if(B.gameState() != MNKGameState.OPEN)
+				System.exit(1);
 			return utility.evaluateBoard2(B, Counters);
 		}
 
