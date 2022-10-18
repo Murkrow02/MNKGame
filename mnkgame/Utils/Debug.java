@@ -92,6 +92,22 @@ public class Debug {
         System.out.println(cell.i + "," + cell.j + ": " + val);
     }
 
+    public static void PrintDiagonalsCount(int count){
+
+        if(!active)
+            return;
+
+        System.out.println("Totale diagonali: " + count);
+    }
+
+    public static void PrintCountersCount(int count){
+
+        if(!active)
+            return;
+
+        System.out.println("Totale wincounters: " + count);
+    }
+
     public static void AlreadyEvaluated(){
 
         if(!active)

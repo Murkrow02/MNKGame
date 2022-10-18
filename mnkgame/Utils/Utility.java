@@ -42,7 +42,7 @@ public class Utility {
 		return 0;
 	}
 
-	public int evaluateBoard2(MNKBoard B, WinCounters counters) {
+	public int evaluateBoard2(MNKBoard B, mnkgame.WinCounters counters) {
 
 		// Immediately return if gameover
 		if (B.gameState() == myWin) //Best case
@@ -103,7 +103,7 @@ public class Utility {
             return counters.TotalP2Wins-counters.TotalP1Wins; 
 	}
 
-	public void updateWinCounters(MNKBoard B, WinCounters counters, MNKCell lastMove){
+	public void updateWinCounters(MNKBoard B, mnkgame.WinCounters counters, MNKCell lastMove){
 
 		//Some counters are already set and we have access to last move, continue by analyzing only affected win counters
 		LinkedList<Integer> CountersReferences = counters.CountersAffectedByMove(lastMove); //All the wincounters affected by this move 
