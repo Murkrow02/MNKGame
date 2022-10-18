@@ -118,51 +118,51 @@ public class WinCounters {
             //TOP TO DOWN ARROWS
 
             //Every diagonal starting from first column to last row (including middle one)
-            for(int j = b.M-1; j >= 0; j--){
-
-                int old_j = j;
-                int i = 0;
-
-                //Check if can place enough symbols to reach victory on this diagonal
-                List<MNKCell> visited_cells = new LinkedList<>();
-                while(i < b.N && j < b.M){
-                    visited_cells.add(new MNKCell(i,j));
-                    i++;
-                    j++;
-                }
-
-                //If we can place at least k symbols on this column then there is enough space to reach victory
-                boolean enough_space = visited_cells.size() >= b.K;
-
-                if(enough_space){
-
-                    //Add a new counter
-                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
-                    Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
-                    for(MNKCell c : visited_cells){
-                        //Add reference from this cell to target WinCounter
-                        WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
-                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
-                    }
-
-                    CountersIndexPointer++;
-                    totalDiagonals++;
-                }
-
-
-                //Restore i that was modified in the while loop
-                j = old_j;
-            }
-
-            //Every diagonal starting from first row to last column (excluding middle one)
-            for(int i = b.N-1; i >= 1; i--){
+            for(int i = b.M-1; i >= 0; i--){
 
                 int old_i = i;
                 int j = 0;
 
                 //Check if can place enough symbols to reach victory on this diagonal
                 List<MNKCell> visited_cells = new LinkedList<>();
-                while(i < b.N && j < b.M){
+                while(i < b.M && j < b.N){
+                    visited_cells.add(new MNKCell(i,j));
+                    i++;
+                    j++;
+                }
+
+                //If we can place at least k symbols on this column then there is enough space to reach victory
+                boolean enough_space = visited_cells.size() >= b.K;
+
+                if(enough_space){
+
+                    //Add a new counter
+                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                    Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
+                    for(MNKCell c : visited_cells){
+                        //Add reference from this cell to target WinCounter
+                        WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
+                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
+                    }
+
+                    CountersIndexPointer++;
+                    totalDiagonals++;
+                }
+
+
+                //Restore i that was modified in the while loop
+                i = old_i;
+            }
+
+            //Every diagonal starting from first row to last column (excluding middle one)
+            for(int j = b.M-1; j >= 1; j--){
+
+                int old_j = j;
+                int i = 0;
+
+                //Check if can place enough symbols to reach victory on this diagonal
+                List<MNKCell> visited_cells = new LinkedList<>();
+                while(i < b.M && j < b.N){
                     visited_cells.add(new MNKCell(i,j));
                     i++;
                     j++;
@@ -181,6 +181,8 @@ public class WinCounters {
                         //Add reference from this cell to target WinCounter
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
                         Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
+
+
                     }
 
                     CountersIndexPointer++;
@@ -189,62 +191,23 @@ public class WinCounters {
 
 
                 //Restore i that was modified in the while loop
-                i = old_i;
+                j = old_j;
             }
 
             //FROM DOWN TO TOP
 
-            //Every diagonal starting from last column to last row (including middle one)
-            for(int i = b.N-1; i >= 0; i--){
-
-                int old_i = i;
-                int j = b.M-1;
-
-                //Check if can place enough symbols to reach victory on this diagonal
-                List<MNKCell> visited_cells = new LinkedList<>();
-                while(i < b.N && j >= 0){
-                    visited_cells.add(new MNKCell(i,j));
-                    i++;
-                    j--;
-                }
-
-                //If we can place at least k symbols on this column then there is enough space to reach victory
-                boolean enough_space = visited_cells.size() >= b.K;
-
-                if(enough_space){
-
-                    //Add a new counter
-                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
-                    Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
-
-                    //System.out.println("\nFrom first column to last row:");
-                    for(MNKCell c : visited_cells){
-                        //Add reference from this cell to target WinCounter
-                        WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
-                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
-                    }
-
-                    CountersIndexPointer++;
-                    totalDiagonals++;
-                }
-
-
-                //Restore i that was modified in the while loop
-                i = old_i;
-            }
-
-            //Every diagonal starting from first column to first row (excluding middle one)
-            for(int j = b.M-2; j >= 0; j--){
+            //Every diagonal starting from last row to last column (including middle one)
+            for(int j = b.M-1; j >= 0; j--){
 
                 int old_j = j;
-                int i = 0;
+                int i = b.M-1;
 
                 //Check if can place enough symbols to reach victory on this diagonal
                 List<MNKCell> visited_cells = new LinkedList<>();
-                while(i < b.N && j >= 0){
+                while(i >= 0 && j < b.N){
                     visited_cells.add(new MNKCell(i,j));
-                    i++;
-                    j--;
+                    i--;
+                    j++;
                 }
 
                 //If we can place at least k symbols on this column then there is enough space to reach victory
@@ -255,6 +218,7 @@ public class WinCounters {
                     //Add a new counter
                     Counters[CountersIndexPointer] = new mnkgame.WinCounter();
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
+
                     //System.out.println("\nFrom first column to last row:");
                     for(MNKCell c : visited_cells){
                         //Add reference from this cell to target WinCounter
@@ -269,6 +233,45 @@ public class WinCounters {
 
                 //Restore i that was modified in the while loop
                 j = old_j;
+            }
+
+            //Every diagonal starting from first column to first row (excluding middle one)
+            for(int i = b.M-2; i >= 0; i--){
+
+                int old_i = i;
+                int j = 0;
+
+                //Check if can place enough symbols to reach victory on this diagonal
+                List<MNKCell> visited_cells = new LinkedList<>();
+                while(i >= 0 && j < b.N){
+                    visited_cells.add(new MNKCell(i,j));
+                    i--;
+                    j++;
+                }
+
+                //If we can place at least k symbols on this column then there is enough space to reach victory
+                boolean enough_space = visited_cells.size() >= b.K;
+
+                if(enough_space){
+
+                    //Add a new counter
+                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                    Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
+                    //System.out.println("\nFrom first column to last row:");
+                    for(MNKCell c : visited_cells){
+                        System.out.println(c.i + " " + c.j);
+                        //Add reference from this cell to target WinCounter
+                        WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
+                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
+                    }
+
+                    CountersIndexPointer++;
+                    totalDiagonals++;
+                }
+
+
+                //Restore i that was modified in the while loop
+                i = old_i;
             }
 
             mnkgame.Debug.PrintDiagonalsCount(totalDiagonals);

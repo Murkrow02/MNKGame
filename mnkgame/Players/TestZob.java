@@ -13,15 +13,15 @@ import mnkgame.*;
 public class TestZob implements MNKPlayer {
 
 	private MNKBoard B;
-	private Utility utility;
+	private mnkgame.Utility utility;
 
 	/* This tri-dimensional array stores M*N random values, is used 
 	   by the game board hashing function to create a unique hash of 
 	   each possible game state
 	*/
-	public ZobristTable ZT;
+	public mnkgame.ZobristTable ZT;
 
-	public WinCounters Counters;
+	public mnkgame.WinCounters Counters;
 
 	/**
    * Default empty constructor
@@ -31,7 +31,7 @@ public class TestZob implements MNKPlayer {
 
 	public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
 		
-		utility = new Utility();
+		utility = new mnkgame.Utility();
 
 		//LOCAL BOARD
 		B       = new MNKBoard(M,N,K); 
@@ -51,7 +51,7 @@ public class TestZob implements MNKPlayer {
 		utility.yourMark = utility.meFirst ? MNKCellState.P2 : MNKCellState.P1;
 
 		//Initialize Zobrist table
-		ZT = new ZobristTable(M,N);
+		ZT = new mnkgame.ZobristTable(M,N);
 
 		//Initialize hash table 
 		int MaxTableSize = 1<<20; // 2^20
@@ -65,7 +65,7 @@ public class TestZob implements MNKPlayer {
 		ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
 
 		//Initialize wincounters and respective cell references
-		Counters = new WinCounters(B);
+		Counters = new mnkgame.WinCounters(B);
 	}
 
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
@@ -93,7 +93,7 @@ public class TestZob implements MNKPlayer {
 		Integer MaxMoveValue = Integer.MIN_VALUE;
 
 		//DEBUG
-		Debug.Reset();
+		mnkgame.Debug.Reset();
 
 		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
@@ -111,7 +111,7 @@ public class TestZob implements MNKPlayer {
 				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
 
 				//DEBUG
-				Debug.PrintMiddleCicle(B, d, MoveVal);
+				mnkgame.Debug.PrintMiddleCicle(B, d, MoveVal);
 
 				//Rollback
 				B.unmarkCell();
@@ -125,11 +125,11 @@ public class TestZob implements MNKPlayer {
 				//Check timeout
 				if(utility.isTimeExpiring())
 				{
-					Debug.SolvedGame = false;
+					mnkgame.Debug.SolvedGame = false;
 					break;
 				}
 				else
-				utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger					
+				utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 			}
 			
 			//if(ReachedLeaf >= FreeCells)
@@ -143,7 +143,7 @@ public class TestZob implements MNKPlayer {
 		B.markCell(BestMove.i, BestMove.j); //Update local board with this move
 		
 		//DEBUG
-		Debug.PrintSummary();
+		mnkgame.Debug.PrintSummary();
 
 		return BestMove; //Update game board
 	}
@@ -151,13 +151,11 @@ public class TestZob implements MNKPlayer {
     public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth, MNKCell lastMove){
 
 		//DEBUG
-		Debug.IncreaseEvaluations();
+		mnkgame.Debug.IncreaseEvaluations();
 
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
-		{			
-			if(B.gameState() != MNKGameState.OPEN)
-				System.exit(1);
+		{
 			return utility.evaluateBoard2(B, Counters);
 		}
 
@@ -183,14 +181,14 @@ public class TestZob implements MNKPlayer {
 
 				//Already evaluated this game state
 				if(boardValue != null){
-					Debug.AlreadyEvaluated();
+					mnkgame.Debug.AlreadyEvaluated();
 				}
 				else{
 					//Recursively call minmax on this board scenario
 					boardValue = miniMax(false, alpha, beta, boardHash, --depth, current);
 
 					//Add current value to HashSet for future use
-					ZT.EvaluatedStates.put(boardHash, boardValue);	
+					ZT.EvaluatedStates.put(boardHash, boardValue);
 
 					//Add simmetric board states to HashSet as they have the same static evaluation
 					ZT.addSimmetryHashes(B, boardValue);
@@ -208,7 +206,7 @@ public class TestZob implements MNKPlayer {
 				//Prune if better result was available before, no need to continue searching
 				alpha = Math.max(alpha, MaxValue);
 				if (alpha >= beta) {
-					Debug.Cuts++;
+					mnkgame.Debug.Cuts++;
 					return MaxValue;
 				}
 			}
@@ -238,14 +236,14 @@ public class TestZob implements MNKPlayer {
 				
 				//Already evaluated this state
 				if (boardValue != null) {
-					Debug.AlreadyEvaluated();
+					mnkgame.Debug.AlreadyEvaluated();
 				} else{
 
 					//Recursively call minmax on this board scenario
 					boardValue = miniMax(true, alpha, beta, boardHash, --depth, current);
 
 					//Add current value to HashSet for future use
-					ZT.EvaluatedStates.put(boardHash, boardValue);	
+					ZT.EvaluatedStates.put(boardHash, boardValue);
 
 					//Add simmetric board states to HashSet as they have the same static evaluation
 					ZT.addSimmetryHashes(B, boardValue);
@@ -263,7 +261,7 @@ public class TestZob implements MNKPlayer {
 				//Prune if better result was available before, no need to continue searching
 				beta = Math.min(beta, MinValue);
 				if (beta <= alpha) {
-					Debug.Cuts++;
+					mnkgame.Debug.Cuts++;
 					return MinValue;
 				}
 			}
