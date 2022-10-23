@@ -87,10 +87,7 @@ public class TestZob implements MNKPlayer {
 		}
 
 		//Use the first available cell if something goes wrong
-		MNKCell BestMove = FC[0]; 
-
-		//Initially assume the best move is the worst possible value and then use relaxing technique
-		Integer MaxMoveValue = Integer.MIN_VALUE;
+		MNKCell BestMove = FC[0];
 
 		//DEBUG
 		mnkgame.Debug.Reset();
@@ -98,7 +95,21 @@ public class TestZob implements MNKPlayer {
 		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
 		//Iterative deep, increase depth each time until timeout
+		int PossibleMoves = FC.length;
 		for(int i = 0; !utility.isTimeExpiring(); ++i){
+
+			/*
+			* Assume that the most reliable result is the one obtained from the last iteration
+			* so every time an iteration completes, the best result found in that iteration is
+			* set as the best result to this point. If somehow the iteration breaks (for example
+			* timeout is triggered) the best move for iteration will be discarded and the previous
+			* iteration result will be taken as best (if an iteration is stopped we cannot say that
+			* the best result found is indeed the best of all the others)
+			* */
+			Integer IterationMax = Integer.MIN_VALUE;
+			MNKCell BestIterationMove = FC[0];
+			int CellExaminedCount = 0;
+			Boolean FinishedIteration = true;
 
 			for(MNKCell d : FC) {
 
@@ -109,6 +120,7 @@ public class TestZob implements MNKPlayer {
 				
 				//Apply minimax algorithm on the cell
 				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
+				CellExaminedCount++;
 
 				//DEBUG
 				mnkgame.Debug.PrintMiddleCicle(B, d, MoveVal);
@@ -117,27 +129,25 @@ public class TestZob implements MNKPlayer {
 				B.unmarkCell();
 
 				//Check if found a better move
-				if(MoveVal > MaxMoveValue){
-					MaxMoveValue = MoveVal;
-					BestMove = d;
+				if(MoveVal > IterationMax){
+					IterationMax = MoveVal;
+					BestIterationMove = d;
 				}
 
-				//Check timeout
-				if(utility.isTimeExpiring())
+				//Check if time is expiring and we didn't reach last cell to examine
+				if(utility.isTimeExpiring() && CellExaminedCount < PossibleMoves)
 				{
-					mnkgame.Debug.SolvedGame = false;
+					FinishedIteration = false;
 					break;
 				}
 				else
-				utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
+					utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 			}
-			
-			//if(ReachedLeaf >= FreeCells)
-			//	break;
 
-			//System.out.println(ReachedLeaf);
+			//Only set this iteration best move as global best move if iteration has not stopped
+			if(FinishedIteration)
+				BestMove = BestIterationMove;
 		}
-		
 
 		//Return the result
 		B.markCell(BestMove.i, BestMove.j); //Update local board with this move
@@ -163,10 +173,10 @@ public class TestZob implements MNKPlayer {
 		if(maximizingPlayer){
 
 			//Relax technique, assume the worst case scenario and relax on each step
-			Integer MaxValue = Integer.MIN_VALUE;
+			int MaxValue = Integer.MIN_VALUE;
 
 			//Cycle through all possible moves
-			MNKCell FC[] = B.getFreeCells();
+			MNKCell[] FC = B.getFreeCells();
 			for(MNKCell current : FC) {
 				
 				//Mark this cell as player move
@@ -190,7 +200,7 @@ public class TestZob implements MNKPlayer {
 					//Add current value to HashSet for future use
 					ZT.EvaluatedStates.put(boardHash, boardValue);
 
-					//Add simmetric board states to HashSet as they have the same static evaluation
+					//Add symmetric board states to HashSet as they have the same static evaluation
 					ZT.addSimmetryHashes(B, boardValue);
 				}
 
@@ -218,7 +228,7 @@ public class TestZob implements MNKPlayer {
 		else{
 
 			//Relax technique, assume the worst case scenario and relax on each step
-			Integer MinValue = Integer.MAX_VALUE;
+			int MinValue = Integer.MAX_VALUE;
 
 			//Cycle through all possible moves
 			MNKCell FC[] = B.getFreeCells();
@@ -233,7 +243,7 @@ public class TestZob implements MNKPlayer {
 				//Check if already evaluated this game state
 				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.yourMark) : ZT.computeHash(B);
 				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
-				
+
 				//Already evaluated this state
 				if (boardValue != null) {
 					mnkgame.Debug.AlreadyEvaluated();
