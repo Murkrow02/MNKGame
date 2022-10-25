@@ -77,9 +77,6 @@ public class ZobristTable {
         // CustomMNKBoard simmetricYBoard = new CustomMNKBoard(b.M, b.N, b.K);
         // CustomMNKBoard simmetricXYBoard = new CustomMNKBoard(b.M, b.N, b.K);
 
-		//Check if even columns and rows
-		boolean evenColumns = b.N%2 == 0;
-        boolean evenRows = b.M%2 == 0;
 
         //Find middle columns and rows
 		int middleColumn = b.N/2;
@@ -88,8 +85,8 @@ public class ZobristTable {
 		//Cycle through already marked cells
 		for(MNKCell c : b.MC) {
 			
-            //Only quare board rotations
-            if(evenColumns && evenRows){
+            //Only square board rotations
+            if(b.N == b.M){
 
                 //Hash90
                 MNKCell rotate90 = new MNKCell(c.j, b.N - c.i-1);

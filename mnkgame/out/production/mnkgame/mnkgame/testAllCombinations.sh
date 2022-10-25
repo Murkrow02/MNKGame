@@ -3,18 +3,18 @@
 cd out/mnkgame
 
 #Test all combinations
-#echo -e "\n 3 3 3"
-#java -cp ".." mnkgame.MNKPlayerTester 3 3 3 mnkgame.$1 mnkgame.$1
-#echo -e "\n 4 3 3"
-#java -cp ".." mnkgame.MNKPlayerTester 4 3 3 mnkgame.$1 mnkgame.$1
-#echo -e "\n 4 4 3"
-#java -cp ".." mnkgame.MNKPlayerTester 4 4 3 mnkgame.$1 mnkgame.$1
-#echo -e "\n 4 4 4"
-#java -cp ".." mnkgame.MNKPlayerTester 4 4 4 mnkgame.$1 mnkgame.$1
-#echo -e "\n 5 4 4"
-#java -cp ".." mnkgame.MNKPlayerTester 5 4 4 mnkgame.$1 mnkgame.$1
-#echo -e "\n 5 5 4"
-#java -cp ".." mnkgame.MNKPlayerTester 5 5 4 mnkgame.$1 mnkgame.$1
+echo -e "\n 3 3 3"
+java -cp ".." mnkgame.MNKPlayerTester 3 3 3 mnkgame.$1 mnkgame.$1
+echo -e "\n 4 3 3"
+java -cp ".." mnkgame.MNKPlayerTester 4 3 3 mnkgame.$1 mnkgame.$1
+echo -e "\n 4 4 3"
+java -cp ".." mnkgame.MNKPlayerTester 4 4 3 mnkgame.$1 mnkgame.$1
+echo -e "\n 4 4 4"
+java -cp ".." mnkgame.MNKPlayerTester 4 4 4 mnkgame.$1 mnkgame.$1
+echo -e "\n 5 4 4"
+java -cp ".." mnkgame.MNKPlayerTester 5 4 4 mnkgame.$1 mnkgame.$1
+echo -e "\n 5 5 4"
+java -cp ".." mnkgame.MNKPlayerTester 5 5 4 mnkgame.$1 mnkgame.$1
 echo -e "\n 5 5 5"
 java -cp ".." mnkgame.MNKPlayerTester 5 5 5 mnkgame.$1 mnkgame.$1
 echo -e "\n 6 4 4"
