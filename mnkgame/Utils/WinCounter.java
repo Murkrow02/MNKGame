@@ -15,7 +15,8 @@ public class WinCounter{
 
 	/*
 	* NOTES:
-	*
+	* TODO: WRITE THIS SECTION AS IS VERY HARD
+	*  ADD A BONUS WHEN AN OPPONENT HAS 2/4 and two free places (senno viene inculato alla mossa dopo)
 	*
 	* */
 	public void updateCounterWins(MNKBoard B){

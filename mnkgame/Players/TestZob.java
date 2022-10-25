@@ -80,7 +80,7 @@ public class TestZob implements MNKPlayer {
 		if(MC.length > 0) {
 			MNKCell c = MC[MC.length-1]; // Recover move from opponent
 			B.markCell(c.i,c.j);         // Save the last move in the local MNKBoard
-			//utility.updateWinCounters(B, Counters, c);
+			utility.updateWinCounters(B, Counters, c);
 		}
 
 		// If there is just one possible move, return immediately (match is over)
@@ -119,6 +119,7 @@ public class TestZob implements MNKPlayer {
 
 				//Mark this cell as player move (temp)
 				B.markCell(d.i, d.j);
+				utility.updateWinCounters(B, Counters, d);
 
 				//Apply minimax algorithm on the cell
 				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
@@ -129,6 +130,7 @@ public class TestZob implements MNKPlayer {
 
 				//Rollback
 				B.unmarkCell();
+				utility.updateWinCounters(B, Counters, d);
 
 				//Check if found a better move
 				if(MoveVal > IterationMax){
@@ -153,7 +155,7 @@ public class TestZob implements MNKPlayer {
 
 		//Return the result
 		B.markCell(BestMove.i, BestMove.j); //Update local board with this move
-		//utility.updateWinCounters(B, Counters, BestMove);
+		utility.updateWinCounters(B, Counters, BestMove);
 
 		//DEBUG
 		mnkgame.Debug.PrintSummary();
@@ -170,8 +172,6 @@ public class TestZob implements MNKPlayer {
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
 		{
-			if(B.gameState() != MNKGameState.OPEN)
-				System.out.println("");
 			return utility.evaluateBoard2(B, Counters);
 		}
 
