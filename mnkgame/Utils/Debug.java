@@ -5,7 +5,7 @@ import mnkgame.*;
 public class Debug {
 
     //Enable-disable debug logs
-    public static boolean active = false;
+    public static boolean active = true;
 
     public static long CellEvaluations = 0;
     public static long TotalEvaluations = 0;
@@ -65,9 +65,23 @@ public class Debug {
         System.out.println("Evaluations: " + TotalEvaluations);
         System.out.println("Cuts: " + Cuts);
         System.out.println("Max depth reached: " + MaxDepthReached);
-        if(SolvedGame){
-            System.out.println("Game solved in: " + AlgorithmStarts);
+
+
+
+//        if(SolvedGame){
+//            System.out.println("Game solved in: " + AlgorithmStarts);
+//        }
+    }
+
+    public static void PrintCounters(mnkgame.WinCounters counters){
+        System.out.println("\n---------WINCOUNTERS---------");
+        for (mnkgame.WinCounter counter : counters.Counters){
+            System.out.println(counter.Name + " P1: " + counter.P1Score + " P2: " + counter.P2Score);
+//            for(MNKCell controlled : counter.CellsToCheck){
+//                System.out.println(controlled.toString());
+//            }
         }
+
     }
 
     public static void IncreaseEvaluations(){

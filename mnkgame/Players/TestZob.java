@@ -66,6 +66,9 @@ public class TestZob implements MNKPlayer {
 
 		//Initialize wincounters and respective cell references
 		Counters = new mnkgame.WinCounters(B);
+
+		//First scan of the whole board, foreach WinCounter check how many wins player can reach
+		Counters.UpdateAllCounters(B);
 	}
 
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
@@ -77,8 +80,9 @@ public class TestZob implements MNKPlayer {
 		if(MC.length > 0) {
 			MNKCell c = MC[MC.length-1]; // Recover move from opponent
 			B.markCell(c.i,c.j);         // Save the last move in the local MNKBoard
+			//utility.updateWinCounters(B, Counters, c);
 		}
-		
+
 		// If there is just one possible move, return immediately (match is over)
 		if(FC.length == 1)
 		{
@@ -109,15 +113,13 @@ public class TestZob implements MNKPlayer {
 			Integer IterationMax = Integer.MIN_VALUE;
 			MNKCell BestIterationMove = FC[0];
 			int CellExaminedCount = 0;
-			Boolean FinishedIteration = true;
+			boolean FinishedIteration = true;
 
 			for(MNKCell d : FC) {
 
 				//Mark this cell as player move (temp)
 				B.markCell(d.i, d.j);
 
-				Counters.UpdateAllCounters(B);
-				
 				//Apply minimax algorithm on the cell
 				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
 				CellExaminedCount++;
@@ -151,9 +153,11 @@ public class TestZob implements MNKPlayer {
 
 		//Return the result
 		B.markCell(BestMove.i, BestMove.j); //Update local board with this move
-		
+		//utility.updateWinCounters(B, Counters, BestMove);
+
 		//DEBUG
 		mnkgame.Debug.PrintSummary();
+		mnkgame.Debug.PrintCounters(Counters);
 
 		return BestMove; //Update game board
 	}
@@ -166,6 +170,8 @@ public class TestZob implements MNKPlayer {
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
 		{
+			if(B.gameState() != MNKGameState.OPEN)
+				System.out.println("");
 			return utility.evaluateBoard2(B, Counters);
 		}
 
@@ -231,7 +237,7 @@ public class TestZob implements MNKPlayer {
 			int MinValue = Integer.MAX_VALUE;
 
 			//Cycle through all possible moves
-			MNKCell FC[] = B.getFreeCells();
+			MNKCell[] FC = B.getFreeCells();
 			for(MNKCell current : FC) {
 
 				//Mark this cell as player move

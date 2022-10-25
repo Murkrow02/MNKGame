@@ -1,13 +1,12 @@
 package mnkgame;
 
-import mnkgame.*;
 import java.util.*;
 
 public class WinCounters {
     
     //Save here total wins to prevent cicling each time on array to get exact scores
-    public int TotalP1Wins = 0;
-    public int TotalP2Wins = 0;
+    public int TotalP1Score = 0;
+    public int TotalP2Score = 0;
 
     public mnkgame.WinCounter[] Counters;
     public ArrayList<ArrayList<LinkedList<Integer>>> WinCountersReferences;
@@ -67,6 +66,7 @@ public class WinCounters {
 
                 //Add a new counter
                 Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                Counters[CountersIndexPointer].Name = "Row " + i;
                 Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
                 
 				//Foreach column
@@ -90,6 +90,7 @@ public class WinCounters {
 
                 //Add a new counter
                 Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                Counters[CountersIndexPointer].Name = "Column " + j;
                 Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
                 
 				//Foreach row
@@ -176,7 +177,6 @@ public class WinCounters {
                     //Add a new counter
                     Counters[CountersIndexPointer] = new mnkgame.WinCounter();
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
-                    //System.out.println("\nFrom first column to last row:");
                     for(MNKCell c : visited_cells){
                         //Add reference from this cell to target WinCounter
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
@@ -219,7 +219,6 @@ public class WinCounters {
                     Counters[CountersIndexPointer] = new mnkgame.WinCounter();
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
 
-                    //System.out.println("\nFrom first column to last row:");
                     for(MNKCell c : visited_cells){
                         //Add reference from this cell to target WinCounter
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
@@ -259,7 +258,6 @@ public class WinCounters {
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
                     //System.out.println("\nFrom first column to last row:");
                     for(MNKCell c : visited_cells){
-                        System.out.println(c.i + " " + c.j);
                         //Add reference from this cell to target WinCounter
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
                         Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
@@ -282,8 +280,8 @@ public class WinCounters {
     public void UpdateAllCounters(MNKBoard B){  
 
         //Reset total win (we are going to start from scratch)
-        TotalP1Wins = 0;
-        TotalP2Wins = 0;
+        TotalP1Score = 0;
+        TotalP2Score = 0;
 
         for(var counter : Counters){
 
@@ -291,8 +289,8 @@ public class WinCounters {
             counter.updateCounterWins(B);
 
             //Update total wins adding those tracked by this counter
-			TotalP1Wins+=counter.P1Wins;
-			TotalP2Wins+=counter.P2Wins;
+			TotalP1Score +=counter.P1Score;
+			TotalP2Score +=counter.P2Score;
         }
     }
 
@@ -300,16 +298,6 @@ public class WinCounters {
         return WinCountersReferences.get(move.i).get(move.j);
     }
 
-    // public void Reset(){
 
-    //     //Reset all counters to 0
-    //     for (WinCounter counter : Counters) {
-    //         TotalP1Wins = 0;
-    //         TotalP2Wins = 0;
-    //         counter.P1Wins = 0;
-    //         counter.P2Wins = 0;
-    //         counter.Full = false;
-    //     }
-    // }
 
 }

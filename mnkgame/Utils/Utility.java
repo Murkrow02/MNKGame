@@ -1,6 +1,5 @@
 package mnkgame;
 
-import mnkgame.*;
 import java.util.*;
 
 public class Utility {
@@ -53,7 +52,7 @@ public class Utility {
 		//Evaluate intermediate states
 
 		//P1 is winning
-		if(counters.TotalP1Wins > 0 && counters.TotalP2Wins <= 0){
+		if(counters.TotalP1Score > 0 && counters.TotalP2Score <= 0){
 
 			/*
 			We are P1, so we have a possible win but opponent does not
@@ -74,7 +73,7 @@ public class Utility {
 		}
 
 		//P2 is winning
-		if(counters.TotalP2Wins > 0 && counters.TotalP1Wins <= 0){
+		if(counters.TotalP2Score > 0 && counters.TotalP1Score <= 0){
 
 			/*
 			We are P1 so there is no way we can win, we can at maximum achieve a draw
@@ -98,9 +97,9 @@ public class Utility {
 		summarises the current game state, by subtracting the opponent possible wins from ours
 		*/
 		if(meFirst)
-            return counters.TotalP1Wins-counters.TotalP2Wins;
+            return counters.TotalP1Score -counters.TotalP2Score;
         else
-            return counters.TotalP2Wins-counters.TotalP1Wins; 
+            return counters.TotalP2Score -counters.TotalP1Score;
 	}
 
 	public void updateWinCounters(MNKBoard B, mnkgame.WinCounters counters, MNKCell lastMove){
@@ -119,16 +118,16 @@ public class Utility {
 			//	System.out.println(controlled.i +  " " + controlled.j);
 			//}	
 
-			//Wins counted by this counter need to be updated so refresh the total win count
-			counters.TotalP1Wins-=counters.Counters[index].P1Wins;
-			counters.TotalP2Wins-=counters.Counters[index].P2Wins;
+			//Score stored by this counter need to be updated so refresh the total win count
+			counters.TotalP1Score -=counters.Counters[index].P1Score;
+			counters.TotalP2Score -=counters.Counters[index].P2Score;
 
 			//Now effectively search for new wins on this counter
 			counters.Counters[index].updateCounterWins(B);
 
 			//Update total wins on board after this move
-			counters.TotalP1Wins+=counters.Counters[index].P1Wins;
-			counters.TotalP2Wins+=counters.Counters[index].P2Wins;
+			counters.TotalP1Score +=counters.Counters[index].P1Score;
+			counters.TotalP2Score +=counters.Counters[index].P2Score;
 
 		}
 	}
