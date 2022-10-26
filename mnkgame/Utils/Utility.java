@@ -41,7 +41,7 @@ public class Utility {
 		return 0;
 	}
 
-	public int evaluateBoard2(MNKBoard B, mnkgame.WinCounters counters) {
+	public int evaluateBoard2(MNKBoard B, mnkgame.WinCounters counters, int depth) {
 
 		// Immediately return if gameover
 		if (B.gameState() == myWin) //Best case

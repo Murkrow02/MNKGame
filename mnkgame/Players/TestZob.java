@@ -1,5 +1,6 @@
 package mnkgame;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 import mnkgame.*;
 
@@ -100,7 +101,8 @@ public class TestZob implements MNKPlayer {
 
 		//Iterative deep, increase depth each time until timeout
 		int PossibleMoves = FC.length;
-		for(int i = 0; !utility.isTimeExpiring(); ++i){
+		for(int i = 0; !utility.isTimeExpiring(); ++i)
+		{
 
 			/*
 			* Assume that the most reliable result is the one obtained from the last iteration
@@ -135,6 +137,7 @@ public class TestZob implements MNKPlayer {
 				//Check if found a better move
 				if(MoveVal > IterationMax){
 					IterationMax = MoveVal;
+					//BestMove = d;
 					BestIterationMove = d;
 				}
 
@@ -172,7 +175,7 @@ public class TestZob implements MNKPlayer {
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
 		{
-			return utility.evaluateBoard2(B, Counters);
+			return utility.evaluateBoard2(B, Counters, depth);
 		}
 
 		//Our turn (Maximizing)
