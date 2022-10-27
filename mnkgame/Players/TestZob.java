@@ -211,26 +211,28 @@ public class TestZob implements MNKPlayer {
 				//Update wincounters affected by this move 
 				utility.updateWinCounters(B, Counters, current);
 
-//				//Check if already evaluated this game state
-//				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
-//				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
-//
-//				//Already evaluated this game state
-//				if(boardValue != null){
+				//Check if already evaluated this game state
+				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
+				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
+
+				//Already evaluated this game state
+				if(boardValue != null){
 //					mnkgame.Debug.AlreadyEvaluated();
-//				}
-//				else{
-//					//Recursively call minmax on this board scenario
+//					int d = depth-1;
+//					int boardValue2 = miniMax(false, alpha, beta, boardHash, d, current);
+//					System.out.println("");
+				}
+				else{
+					//Recursively call minmax on this board scenario
 					int d = depth-1;
-//					boardValue = miniMax(false, alpha, beta, boardHash, d, current);
-					Integer boardValue = miniMax(false, alpha, beta, null, d, current);
-//
-//					//Add current value to HashSet for future use
-//					ZT.EvaluatedStates.put(boardHash, boardValue);
-//
-//					//Add symmetric board states to HashSet as they have the same static evaluation
-//					ZT.addSimmetryHashes(B, boardValue);
-//				}
+					boardValue = miniMax(false, alpha, beta, boardHash, d, current);
+
+					//Add current value to HashSet for future use
+					//ZT.EvaluatedStates.put(boardHash, boardValue);
+
+					//Add symmetric board states to HashSet as they have the same static evaluation
+					//ZT.addSimmetryHashes(B, boardValue); BUGGATO
+				}
 
 				//Undo the move
 				B.unmarkCell();
@@ -239,7 +241,7 @@ public class TestZob implements MNKPlayer {
 				utility.updateWinCounters(B, Counters, current);
 
 				//Check if found better value
-				MaxValue = Math.max(MaxValue, boardValue);	
+				MaxValue = Math.max(MaxValue, boardValue);
 
 				//Prune if better result was available before, no need to continue searching
 				alpha = Math.max(alpha, MaxValue);
@@ -268,26 +270,28 @@ public class TestZob implements MNKPlayer {
 				//Update wincounters affected by this move 
 				utility.updateWinCounters(B, Counters, current);
 
-//				//Check if already evaluated this game state
-//				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.yourMark) : ZT.computeHash(B);
-//				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
-//
-//				//Already evaluated this state
-//				if (boardValue != null) {
+				//Check if already evaluated this game state
+				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.yourMark) : ZT.computeHash(B);
+				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
+
+				//Already evaluated this state
+				if (boardValue != null) {
 //					mnkgame.Debug.AlreadyEvaluated();
-//				} else{
-//
-//					//Recursively call minmax on this board scenario
+//					int d = depth-1;
+//					int boardValue2 = miniMax(true, alpha, beta, boardHash, d, current);
+//					System.out.println("");
+				} else{
+
+					//Recursively call minmax on this board scenario
 					int d = depth-1;
-//					boardValue = miniMax(true, alpha, beta, boardHash, d, current);
-					Integer boardValue = miniMax(true, alpha, beta, null, d, current);
-//
-//					//Add current value to HashSet for future use
-//					ZT.EvaluatedStates.put(boardHash, boardValue);
-//
-//					//Add simmetric board states to HashSet as they have the same static evaluation
-//					ZT.addSimmetryHashes(B, boardValue);
-//				}
+					boardValue = miniMax(true, alpha, beta, boardHash, d, current);
+
+					//Add current value to HashSet for future use
+					//ZT.EvaluatedStates.put(boardHash, boardValue); BUGGATO
+
+					//Add simmetric board states to HashSet as they have the same static evaluation
+					//ZT.addSimmetryHashes(B, boardValue);
+				}
 
 				//Undo the move
 				B.unmarkCell();

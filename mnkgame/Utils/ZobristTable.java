@@ -130,13 +130,17 @@ public class ZobristTable {
         // Utility.printGameState(simmetricXYBoard);
 
 		//Add all calculated hashes to evaluated states
-        EvaluatedStates.put(Hash90, value);
+        if(b.N == b.M){
+            EvaluatedStates.put(Hash90, value);
+            EvaluatedStates.put(Hash90S, value);
+            EvaluatedStates.put(Hash270, value);
+            EvaluatedStates.put(Hash270S, value);
+        }
+
         EvaluatedStates.put(Hash180, value);
-        EvaluatedStates.put(Hash270, value);
         EvaluatedStates.put(HashS, value);
-        EvaluatedStates.put(Hash90S, value);
         EvaluatedStates.put(Hash180S, value);
-        EvaluatedStates.put(Hash270S, value);
+
 	}
 
     // If the cell is occupied by P1 return 0, otherwhise (P2) return 1

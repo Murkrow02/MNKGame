@@ -5,7 +5,7 @@ import mnkgame.*;
 public class Debug {
 
     //Enable-disable debug logs
-    public static boolean active = true;
+    public static boolean active = false;
 
     public static long CellEvaluations = 0;
     public static long TotalEvaluations = 0;
@@ -15,6 +15,9 @@ public class Debug {
     public static int AlgorithmStarts = 0;
 
     public static void PrintGameState(MNKBoard b){
+
+        if(!active)
+            return;
 
         System.out.print("\n");
 		for (int i = 0; i < b.M; i++) { // Print gameboard
