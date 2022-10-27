@@ -13,15 +13,7 @@ public class WinCounter{
     public LinkedList<MNKCell> CellsToCheck;
 
     //Updates P1 and P2 wins on this counter by analyzing cells controlled by this counter
-
-	/*
-	* NOTES:
-	* TODO: WRITE THIS SECTION AS IS VERY HARD,
-	*  ADJUST MULTIPLIER TO RETURN 0 IF CANNOT WIN ON THIS COUNTER
-	*
-	*
-	* */
-	public void updateCounterWins(MNKBoard B){
+	public void updateCounterScore(MNKBoard B){
 
 		//Reset counter values
 		P1Score = 0;
@@ -29,21 +21,9 @@ public class WinCounter{
 
 		int P1_FREE = 0, P2_FREE = 0, P1_PLACED = 0, P2_PLACED = 0;
 
-		//
+		//Increment multipliers each time multiple symbols are placed next to each other
 		int MultiplierP1 = 0;
 		int MultiplierP2 = 0;
-
-		/*
-		 * Check for a state in this counter where k-2 symbols are placed near each other
-		 * and 2 free spaces are adjacent to these. In this case the win is 100% because next
-		 * turn no matter what, the player can place the last symbol
-		 *
-		 * 1) first space is empty
-		 * 2) k-2 symbols are placed one next to the other
-		 * 3) last space is empty
-		 * */
-		//int conditionsMetP1 = 0; //When this reaches 3 the condition is met for P1
-		//int conditionsMetP2 = 0; //When this reaches 3 the condition is met for P2
 
 		// Empty counter
 		if (CellsToCheck == null)

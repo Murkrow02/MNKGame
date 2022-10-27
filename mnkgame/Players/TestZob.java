@@ -24,6 +24,12 @@ public class TestZob implements MNKPlayer {
 
 	public mnkgame.WinCounters Counters;
 
+	/*
+	* Count how many times the iteration deepening reached a leaf state
+	* used to stop when we reached all leaf states
+	* */
+	Integer ReachedLeafsCount = 0;
+
 	/**
    * Default empty constructor
    */
@@ -100,7 +106,7 @@ public class TestZob implements MNKPlayer {
 		/*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
 		//Iterative deep, increase depth each time until timeout
-		int PossibleMoves = FC.length;
+		int PossibleMovesCount = FC.length;
 		for(int i = 0; !utility.isTimeExpiring(); ++i)
 		{
 
@@ -116,6 +122,9 @@ public class TestZob implements MNKPlayer {
 			MNKCell BestIterationMove = FC[0];
 			int CellExaminedCount = 0;
 			boolean FinishedIteration = true;
+
+			//Reset count of leaf states reached
+			//ReachedLeafsCount = 0;
 
 			for(MNKCell d : FC) {
 
@@ -141,8 +150,8 @@ public class TestZob implements MNKPlayer {
 					BestIterationMove = d;
 				}
 
-				//Check if time is expiring and we didn't reach last cell to examine
-				if(utility.isTimeExpiring() && CellExaminedCount < PossibleMoves)
+				//Check if time is expiring and we didn't reach last cell to examine -> exit loop and discard this result
+				if(utility.isTimeExpiring() && CellExaminedCount < PossibleMovesCount)
 				{
 					FinishedIteration = false;
 					break;
@@ -150,6 +159,11 @@ public class TestZob implements MNKPlayer {
 				else
 					utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 			}
+
+			//Check if reached leaf state for each possible move -> whole gametree analyzed -> break iteration deepening
+//			if(ReachedLeafsCount == PossibleMovesCount){
+//				break;
+//			}
 
 			//Only set this iteration best move as global best move if iteration has not stopped
 			if(FinishedIteration)
@@ -171,10 +185,13 @@ public class TestZob implements MNKPlayer {
 
 		//DEBUG
 		mnkgame.Debug.IncreaseEvaluations();
+		mnkgame.Debug.PrintGameState(B);
 
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
 		{
+//			if(B.gameState() != MNKGameState.OPEN )
+//				ReachedLeafsCount++;
 			return utility.evaluateBoard2(B, Counters, depth);
 		}
 
@@ -194,24 +211,26 @@ public class TestZob implements MNKPlayer {
 				//Update wincounters affected by this move 
 				utility.updateWinCounters(B, Counters, current);
 
-				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
-				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
-
-				//Already evaluated this game state
-				if(boardValue != null){
-					mnkgame.Debug.AlreadyEvaluated();
-				}
-				else{
-					//Recursively call minmax on this board scenario
-					boardValue = miniMax(false, alpha, beta, boardHash, --depth, current);
-
-					//Add current value to HashSet for future use
-					ZT.EvaluatedStates.put(boardHash, boardValue);
-
-					//Add symmetric board states to HashSet as they have the same static evaluation
-					ZT.addSimmetryHashes(B, boardValue);
-				}
+//				//Check if already evaluated this game state
+//				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
+//				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
+//
+//				//Already evaluated this game state
+//				if(boardValue != null){
+//					mnkgame.Debug.AlreadyEvaluated();
+//				}
+//				else{
+//					//Recursively call minmax on this board scenario
+					int d = depth-1;
+//					boardValue = miniMax(false, alpha, beta, boardHash, d, current);
+					Integer boardValue = miniMax(false, alpha, beta, null, d, current);
+//
+//					//Add current value to HashSet for future use
+//					ZT.EvaluatedStates.put(boardHash, boardValue);
+//
+//					//Add symmetric board states to HashSet as they have the same static evaluation
+//					ZT.addSimmetryHashes(B, boardValue);
+//				}
 
 				//Undo the move
 				B.unmarkCell();
@@ -249,24 +268,26 @@ public class TestZob implements MNKPlayer {
 				//Update wincounters affected by this move 
 				utility.updateWinCounters(B, Counters, current);
 
-				//Check if already evaluated this game state
-				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.yourMark) : ZT.computeHash(B);
-				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
-
-				//Already evaluated this state
-				if (boardValue != null) {
-					mnkgame.Debug.AlreadyEvaluated();
-				} else{
-
-					//Recursively call minmax on this board scenario
-					boardValue = miniMax(true, alpha, beta, boardHash, --depth, current);
-
-					//Add current value to HashSet for future use
-					ZT.EvaluatedStates.put(boardHash, boardValue);
-
-					//Add simmetric board states to HashSet as they have the same static evaluation
-					ZT.addSimmetryHashes(B, boardValue);
-				}
+//				//Check if already evaluated this game state
+//				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.yourMark) : ZT.computeHash(B);
+//				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
+//
+//				//Already evaluated this state
+//				if (boardValue != null) {
+//					mnkgame.Debug.AlreadyEvaluated();
+//				} else{
+//
+//					//Recursively call minmax on this board scenario
+					int d = depth-1;
+//					boardValue = miniMax(true, alpha, beta, boardHash, d, current);
+					Integer boardValue = miniMax(true, alpha, beta, null, d, current);
+//
+//					//Add current value to HashSet for future use
+//					ZT.EvaluatedStates.put(boardHash, boardValue);
+//
+//					//Add simmetric board states to HashSet as they have the same static evaluation
+//					ZT.addSimmetryHashes(B, boardValue);
+//				}
 
 				//Undo the move
 				B.unmarkCell();

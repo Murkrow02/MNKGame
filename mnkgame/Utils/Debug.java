@@ -14,7 +14,7 @@ public class Debug {
     public static boolean SolvedGame = true;
     public static int AlgorithmStarts = 0;
 
-    public static void printGameState(MNKBoard b){
+    public static void PrintGameState(MNKBoard b){
 
         System.out.print("\n");
 		for (int i = 0; i < b.M; i++) { // Print gameboard

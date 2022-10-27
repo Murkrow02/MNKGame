@@ -123,7 +123,7 @@ public class Utility {
 			counters.TotalP2Score -=counters.Counters[index].P2Score;
 
 			//Now effectively search for new wins on this counter
-			counters.Counters[index].updateCounterWins(B);
+			counters.Counters[index].updateCounterScore(B);
 
 			//Update total wins on board after this move
 			counters.TotalP1Score +=counters.Counters[index].P1Score;

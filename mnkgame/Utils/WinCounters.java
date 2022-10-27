@@ -286,7 +286,7 @@ public class WinCounters {
         for(var counter : Counters){
 
             //Keep track of wins on this counter            
-            counter.updateCounterWins(B);
+            counter.updateCounterScore(B);
 
             //Update total wins adding those tracked by this counter
 			TotalP1Score +=counter.P1Score;
