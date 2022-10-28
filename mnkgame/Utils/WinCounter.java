@@ -19,11 +19,14 @@ public class WinCounter{
 		P1Score = 0;
 		P2Score = 0;
 
-		int P1_FREE = 0, P2_FREE = 0, P1_PLACED = 0, P2_PLACED = 0;
+		//Check how many wins in one move, players can obtain by this state
+		int P1_ImmediateWins = 0, P2_ImmediateWins = 0;
 
-		//Increment multipliers each time multiple symbols are placed next to each other
-		int MultiplierP1 = 0;
-		int MultiplierP2 = 0;
+		int Free_Consecutive = 0,
+			FreeOrP1_Consecutive = 0,
+			FreeOrP2_Consecutive = 0,
+			P1_Consecutive = 0,
+			P2_Consecutive = 0;
 
 		// Empty counter
 		if (CellsToCheck == null)
@@ -32,95 +35,91 @@ public class WinCounter{
 		// Check all the cells controlled by this WinCounter
 		for (var cellToCheck : CellsToCheck) {
 
+			//Check current cell marked state
 			MNKCellState targetCellState = B.B[cellToCheck.i][cellToCheck.j];
 
-			//P1 count
-			if (targetCellState == MNKCellState.P2){
-
-				//P2 sign on this cell, reset
-				P1_FREE = 0;
-				P1_PLACED = 0;
-			}
-			else{
-
-				//Check second condition
-				//if(conditionsMetP1 == 1 && P1_PLACED == B.K-2)
-				//	conditionsMetP1 = 2;
-
-				//P1 sign on this cell
-				if(targetCellState == MNKCellState.P1)
-					P1_PLACED++;
-
-				//FREE Cell
-				if(targetCellState == MNKCellState.FREE){
-
-					P1_FREE++;
-
-					//First condition for certain win is met
-					//if(conditionsMetP1 == 0)
-					//	conditionsMetP1 = 1;
-
-					//Check for third condition
-					//if (conditionsMetP1 == 2){
-					//	P1Score = Integer.MAX_VALUE;
-					//	return;
-					//}
-				}
-
-				//P1 has control of this cell
-				if(targetCellState == MNKCellState.P1)
-					MultiplierP1++;
-			}
-
-			// P2 count
+			//P1 controls this cell
 			if (targetCellState == MNKCellState.P1){
 
-				//P2 sign on this cell, reset
-				P2_FREE = 0;
-				P2_PLACED = 0;
+				//Reset free streak and P2 streak
+				FreeOrP2_Consecutive = 0;
+				P2_Consecutive = 0;
+
+				//Increment P1 streak
+				P1_Consecutive++;
+				FreeOrP1_Consecutive++;
 			}
+
+			//P2 controls this cell
+			else if (targetCellState == MNKCellState.P2){
+
+				//Reset free streak and P1 streak
+				FreeOrP1_Consecutive = 0;
+				P1_Consecutive = 0;
+
+				//Increment P2 streak
+				P2_Consecutive++;
+				FreeOrP2_Consecutive++;
+			}
+
+			//Free cell
 			else{
+				FreeOrP1_Consecutive++;
+				FreeOrP2_Consecutive++;
+				Free_Consecutive++;
+				P1_Consecutive = 0;
+				P2_Consecutive = 0;
 
-				//Check second condition
-				//if(conditionsMetP2 == 1 && P2_PLACED == B.K-2)
-				//	conditionsMetP2 = 2;
 
-				//P2 sign on this cell
-				if(targetCellState == MNKCellState.P2)
-					P2_PLACED++;
-
-				//FREE Cell
-				if(targetCellState == MNKCellState.FREE){
-
-					P2_FREE++;
-
-					//Check for first condition
-					//if(conditionsMetP2 == 0)
-					//	conditionsMetP2 = 1;
-
-					//Check for third condition
-					//if (conditionsMetP2 == 2){
-					//	//Third condition is met!!! Add super bonus score1!!!111!1 (and return)
-					//	P2Score = Integer.MAX_VALUE;
-					//	return;
-					//}
-				}
-
-				//P2 has control of this cell
-				if(targetCellState == MNKCellState.P2)
-					MultiplierP2++; //We have multiple
-
+//				//Fakely mark this cell to determine if one time victory is possible from this state
+//				if(B.gameState == MNKGameState.OPEN){
+//					B.markCell(cellToCheck.i, cellToCheck.j);
+//					if(B.gameState == MNKGameState.WINP1)
+//						P1_ImmediateWins++;
+//					else if (B.gameState() == MNKGameState.WINP2)
+//						P2_ImmediateWins++;
+//
+//					//Rollback
+//					B.unmarkCell();
+//
+//					//If any of the two players has more than one win with this move, win is certain so return max value
+//					if(P1_ImmediateWins > 1){
+//						mnkgame.Debug.PrintGameState(B);
+//						P1Score = Integer.MAX_VALUE;
+//						P2Score = 0;
+//						return;
+//					}
+//					if(P2_ImmediateWins > 1){
+//						mnkgame.Debug.PrintGameState(B);
+//						P2Score = Integer.MAX_VALUE;
+//						P1Score = 0;
+//						return;
+//					}
+//				}
 			}
 
-			// Evaluations
-			if (P1_PLACED + P1_FREE >= B.K) {
-				P1Score += Math.pow(10,MultiplierP1);
-				P1_PLACED = 0; P1_FREE = 0; //Reset
+
+			//Evaluations
+			if (FreeOrP1_Consecutive >= B.K) {
+
+				//Win probability is notably higher for multiple signs consequently placed
+				P1Score += Math.pow(10,P1_Consecutive);
+
+				//Reset streaks
+				P1_Consecutive = 0; FreeOrP1_Consecutive = 0;
 			}
-			if (P2_PLACED + P2_FREE >= B.K) {
-				P2Score += Math.pow(10,MultiplierP2);
-				P2_PLACED = 0; P2_FREE = 0; //Reset
+			if (FreeOrP2_Consecutive >= B.K) {
+
+				//Win probability is notably higher for multiple signs consequently placed
+				P2Score += Math.pow(10,P2_Consecutive);
+
+				//Reset streaks
+				P2_Consecutive = 0; FreeOrP2_Consecutive = 0;
 			}
+
+			if(targetCellState != MNKCellState.FREE)
+				Free_Consecutive = 0;
+
 
 			// Check if no need to go further (implement later by saving cell controlled
 			// count and incrementing local variable)

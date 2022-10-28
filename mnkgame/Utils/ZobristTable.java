@@ -16,19 +16,24 @@ public class ZobristTable {
 	public Hashtable<Long, Integer> EvaluatedStates;
 
     //Zobrist table
-	public long ZT[][][];
+	public long[][][] ZT;
 
     // Initialize the Zobrist table with random values
     public ZobristTable(int M, int N) {
 
-        //Init table
+        /*
+        * M is the number of rows
+        * N is the number of cols
+        * 2 is the number of possible pieces
+        * 2 is the number of possible turns
+        * */
         ZT = new long[M][N][2];
 
         //Fill with random position
         for (int i = 0; i < M; ++i) {
             for (int j = 0; j < N; ++j) {
                 for (int k = 0; k < 2; ++k) {
-                    ZT[i][j][k] = new Random().nextLong();
+                        ZT[i][j][k] = new Random().nextLong();
                 }
             }
         }
@@ -149,6 +154,16 @@ public class ZobristTable {
             return 0;
         else if (state == MNKCellState.P2)
             return 1;
+        else
+            return -1;
+    }
+
+    // Used only by diffHash, if placed cell for P1 then is turn of P2 and vice-versa
+    private int turnId(MNKCellState state) {
+        if (state == MNKCellState.P1)
+            return 1;
+        else if (state == MNKCellState.P2)
+            return 0;
         else
             return -1;
     }

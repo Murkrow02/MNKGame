@@ -133,7 +133,7 @@ public class TestZob implements MNKPlayer {
 				utility.updateWinCounters(B, Counters, d);
 
 				//Apply minimax algorithm on the cell
-				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
+				Integer MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d).BoardValue;
 				CellExaminedCount++;
 
 				//DEBUG
@@ -178,21 +178,21 @@ public class TestZob implements MNKPlayer {
 		mnkgame.Debug.PrintSummary();
 		mnkgame.Debug.PrintCounters(Counters);
 
-		return BestMove; //Update game board
+		//Update game UI
+		return BestMove;
 	}
 
-    public Integer miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth, MNKCell lastMove){
+    public mnkgame.MiniMaxState miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth, MNKCell lastMove){
 
 		//DEBUG
 		mnkgame.Debug.IncreaseEvaluations();
-		mnkgame.Debug.PrintGameState(B);
+		//mnkgame.Debug.PrintGameState(B);
 
 		//Base case, evaluation detected gameover or timeout soon
 		if(B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0)
 		{
-//			if(B.gameState() != MNKGameState.OPEN )
-//				ReachedLeafsCount++;
-			return utility.evaluateBoard2(B, Counters, depth);
+			//In return object, save evaluation value and true if reached leaf, false otherwise
+			return new mnkgame.MiniMaxState(utility.evaluateBoard2(B, Counters, depth), B.gameState() != MNKGameState.OPEN);
 		}
 
 		//Our turn (Maximizing)
@@ -200,6 +200,7 @@ public class TestZob implements MNKPlayer {
 
 			//Relax technique, assume the worst case scenario and relax on each step
 			int MaxValue = Integer.MIN_VALUE;
+			boolean IsMaxValueLeaf = false;
 
 			//Cycle through all possible moves
 			MNKCell[] FC = B.getFreeCells();
@@ -214,24 +215,30 @@ public class TestZob implements MNKPlayer {
 				//Check if already evaluated this game state
 				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
 				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
+				boolean reachedLeaf = false;
 
 				//Already evaluated this game state
 				if(boardValue != null){
-//					mnkgame.Debug.AlreadyEvaluated();
-//					int d = depth-1;
-//					int boardValue2 = miniMax(false, alpha, beta, boardHash, d, current);
-//					System.out.println("");
+					//System.out.println("a");
+					reachedLeaf = true;
 				}
 				else{
+
 					//Recursively call minmax on this board scenario
 					int d = depth-1;
-					boardValue = miniMax(false, alpha, beta, boardHash, d, current);
+					mnkgame.MiniMaxState eval = miniMax(false, alpha, beta, boardHash, d, current);
+					boardValue = eval.BoardValue;
+					reachedLeaf = eval.ReachedLeaf;
 
-					//Add current value to HashSet for future use
-					//ZT.EvaluatedStates.put(boardHash, boardValue);
+					//If reached leaf with this evaluation, safely save it in transposition table
+					if(reachedLeaf)
+					{
+						//Add current value to HashSet for future use
+						ZT.EvaluatedStates.put(boardHash, boardValue);
 
-					//Add symmetric board states to HashSet as they have the same static evaluation
-					//ZT.addSimmetryHashes(B, boardValue); BUGGATO
+						//Add symmetric board states to HashSet as they have the same static evaluation
+						ZT.addSimmetryHashes(B, boardValue);
+					}
 				}
 
 				//Undo the move
@@ -241,24 +248,29 @@ public class TestZob implements MNKPlayer {
 				utility.updateWinCounters(B, Counters, current);
 
 				//Check if found better value
-				MaxValue = Math.max(MaxValue, boardValue);
+				if(boardValue > MaxValue)
+				{
+					MaxValue = boardValue;
+					IsMaxValueLeaf = reachedLeaf;
+				}
 
 				//Prune if better result was available before, no need to continue searching
 				alpha = Math.max(alpha, MaxValue);
 				if (alpha >= beta) {
 					mnkgame.Debug.Cuts++;
-					return MaxValue;
+					return new mnkgame.MiniMaxState(MaxValue, reachedLeaf);
 				}
 			}
 
 			//Return the best value obtained
-			return MaxValue;
+			return new mnkgame.MiniMaxState(MaxValue, IsMaxValueLeaf);
 		}
 		//Opponent turn (minimizing)
 		else{
 
 			//Relax technique, assume the worst case scenario and relax on each step
 			int MinValue = Integer.MAX_VALUE;
+			boolean IsMinValueLeaf = false;
 
 			//Cycle through all possible moves
 			MNKCell[] FC = B.getFreeCells();
@@ -273,24 +285,30 @@ public class TestZob implements MNKPlayer {
 				//Check if already evaluated this game state
 				long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.yourMark) : ZT.computeHash(B);
 				Integer boardValue = ZT.EvaluatedStates.getOrDefault(boardHash, null);
+				boolean reachedLeaf = false;
 
-				//Already evaluated this state
-				if (boardValue != null) {
-//					mnkgame.Debug.AlreadyEvaluated();
-//					int d = depth-1;
-//					int boardValue2 = miniMax(true, alpha, beta, boardHash, d, current);
-//					System.out.println("");
-				} else{
+				//Already evaluated this game state
+				if(boardValue != null){
+					//System.out.println("a");
+					reachedLeaf = true;
+				}
+				else{
 
 					//Recursively call minmax on this board scenario
 					int d = depth-1;
-					boardValue = miniMax(true, alpha, beta, boardHash, d, current);
+					mnkgame.MiniMaxState eval = miniMax(true, alpha, beta, boardHash, d, current);
+					boardValue = eval.BoardValue;
+					reachedLeaf = eval.ReachedLeaf;
 
-					//Add current value to HashSet for future use
-					//ZT.EvaluatedStates.put(boardHash, boardValue); BUGGATO
+					//If reached leaf with this evaluation, safely save it in transposition table
+					if(reachedLeaf)
+					{
+						//Add current value to HashSet for future use
+						ZT.EvaluatedStates.put(boardHash, boardValue);
 
-					//Add simmetric board states to HashSet as they have the same static evaluation
-					//ZT.addSimmetryHashes(B, boardValue);
+						//Add symmetric board states to HashSet as they have the same static evaluation
+						ZT.addSimmetryHashes(B, boardValue);
+					}
 				}
 
 				//Undo the move
@@ -300,17 +318,20 @@ public class TestZob implements MNKPlayer {
 				utility.updateWinCounters(B, Counters, current);
 
 				//Check if found better value
-				MinValue = Math.min(MinValue, boardValue);	
-
+				if(boardValue < MinValue)
+				{
+					MinValue = boardValue;
+					IsMinValueLeaf = reachedLeaf;
+				}
 				//Prune if better result was available before, no need to continue searching
 				beta = Math.min(beta, MinValue);
 				if (beta <= alpha) {
 					mnkgame.Debug.Cuts++;
-					return MinValue;
+					return new mnkgame.MiniMaxState(MinValue, reachedLeaf);
 				}
 			}
 
-			return MinValue;
+			return new mnkgame.MiniMaxState(MinValue, IsMinValueLeaf);
 		}
 
 

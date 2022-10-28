@@ -1,5 +1,7 @@
 package mnkgame;
 
+import mnkgame.Debug;
+
 import java.util.*;
 
 public class Utility {
@@ -59,6 +61,7 @@ public class Utility {
 			We cannot lose, worst case is a draw, second best case scenario after 100% win
 			*/
 			if(myMark == MNKCellState.P1){
+				Debug.PrintGameState(B);
 				return MAX_VALUE-1;
 			}
 

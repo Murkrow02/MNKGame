@@ -5,7 +5,7 @@ import mnkgame.*;
 public class Debug {
 
     //Enable-disable debug logs
-    public static boolean active = false;
+    public static boolean active = true;
 
     public static long CellEvaluations = 0;
     public static long TotalEvaluations = 0;
@@ -77,6 +77,9 @@ public class Debug {
     }
 
     public static void PrintCounters(mnkgame.WinCounters counters){
+
+        if(!active)
+            return;
         System.out.println("\n---------WINCOUNTERS---------");
         for (mnkgame.WinCounter counter : counters.Counters){
             System.out.println(counter.Name + " P1: " + counter.P1Score + " P2: " + counter.P2Score);
