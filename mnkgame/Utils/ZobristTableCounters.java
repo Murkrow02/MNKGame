@@ -40,21 +40,22 @@ public class ZobristTableCounters {
         }
     }
 
-    public long computeHash(WinCounter counter) {
+    public long computeHash(WinCounter counter, MNKBoard b) {
 
         long hash = 0;
 
         // Hash based on current table situation
         List<MNKCell> CellsToCheck = counter.CellsToCheck;
+        int index = 0;
         for (MNKCell current : CellsToCheck) {
-            hash ^= ZT[current.i][stateId(current.state)];// Bitwise XOR
+            hash ^= ZT[index++][stateId(b.B[current.i][current.j])];// Bitwise XOR
         }
 
         return hash;
     }
 
-    public long diffHash(long previousHash, MNKCell newCell, int index){
-        return previousHash ^= ZT[index][stateId(newCell.state)];
+    public long diffHash(long previousHash, MNKCellState newCellState, int index){
+        return previousHash ^= ZT[index][stateId(newCellState)];
     }
 
 

@@ -6,8 +6,6 @@ public class Debug {
 
     //Enable-disable debug logs
     public static boolean active = true;
-
-    public static long CellEvaluations = 0;
     public static long TotalEvaluations = 0;
     public static long Cuts = 0;
     public static long MaxDepthReached = 0;
@@ -41,7 +39,7 @@ public class Debug {
 
         System.out.println("\n#######################################\n");
         TotalEvaluations = 0;
-        CellEvaluations = 0;
+        MaxDepthReached = 0;
         Cuts = 0;
         if(!SolvedGame)
             AlgorithmStarts++;
@@ -95,8 +93,11 @@ public class Debug {
         if(!active)
             return;
 
-        CellEvaluations++;
         TotalEvaluations++;
+    }
+
+    public static void NewDepthReached(){
+        MaxDepthReached++;
     }
 
     public static void PrintMiddleCicle(MNKBoard b, MNKCell cell, Integer val){
@@ -104,11 +105,8 @@ public class Debug {
         if(!active)
             return;
 
-        //Check if with this cell we reached maximum depth
-        if(CellEvaluations > MaxDepthReached)
-            MaxDepthReached = CellEvaluations;
+        mnkgame.Debug.IncreaseEvaluations();
 
-        CellEvaluations = 0;
         System.out.println(cell.i + "," + cell.j + ": " + val);
     }
 

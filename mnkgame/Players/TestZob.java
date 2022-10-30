@@ -140,8 +140,8 @@ public class TestZob implements MNKPlayer {
 				mnkgame.Debug.PrintMiddleCicle(B, d, MoveVal);
 
 				//Rollback
-				B.unmarkCell();
 				utility.updateWinCounters(B, Counters, d);
+				B.unmarkCell();
 
 				//Check if found a better move
 				if(MoveVal > IterationMax){
@@ -160,14 +160,12 @@ public class TestZob implements MNKPlayer {
 					utility.TRIGGER_TIMEOUT_PERCENTAGE = utility.DEFAULT_TRIGGER_TIMEOUT_PERCENTAGE; //Reset default timeout trigger
 			}
 
-			//Check if reached leaf state for each possible move -> whole gametree analyzed -> break iteration deepening
-//			if(ReachedLeafsCount == PossibleMovesCount){
-//				break;
-//			}
-
 			//Only set this iteration best move as global best move if iteration has not stopped
 			if(FinishedIteration)
 				BestMove = BestIterationMove;
+
+			//Going deeper!
+			mnkgame.Debug.NewDepthReached();
 		}
 
 		//Return the result
@@ -185,7 +183,6 @@ public class TestZob implements MNKPlayer {
     public mnkgame.MiniMaxState miniMax(boolean maximizingPlayer, int alpha, int beta, Long previousHash, int depth, MNKCell lastMove){
 
 		//DEBUG
-		mnkgame.Debug.IncreaseEvaluations();
 		//mnkgame.Debug.PrintGameState(B);
 
 		//Base case, evaluation detected gameover or timeout soon
@@ -241,11 +238,11 @@ public class TestZob implements MNKPlayer {
 					}
 				}
 
-				//Undo the move
-				B.unmarkCell();
-				
 				//Restore wincounters before this move
 				utility.updateWinCounters(B, Counters, current);
+
+				//Undo the move
+				B.unmarkCell();
 
 				//Check if found better value
 				if(boardValue > MaxValue)
@@ -311,11 +308,11 @@ public class TestZob implements MNKPlayer {
 					}
 				}
 
-				//Undo the move
-				B.unmarkCell();
-
 				//Restore wincounters before this move
 				utility.updateWinCounters(B, Counters, current);
+
+				//Undo the move
+				B.unmarkCell();
 
 				//Check if found better value
 				if(boardValue < MinValue)

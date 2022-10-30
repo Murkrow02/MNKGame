@@ -1,6 +1,7 @@
 package mnkgame;
 
 import mnkgame.Debug;
+import org.w3c.dom.css.Counter;
 
 import java.util.Hashtable;
 
@@ -79,48 +80,6 @@ public class Dummy implements MNKPlayer {
 	}
 
 	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
-
-		MNKCell one = FC[0];
-		MNKCell two = FC[1];
-
-		//long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
-
-		long emptyHash = ZT.computeHash(B);
-		Debug.PrintGameState(B);
-		System.out.println(emptyHash);
-
-		//Mark first cell
-		B.markCell(one.i, one.j);
-		long firstHash = ZT.computeHash(B);
-		long firstHash2 = ZT.diffHash(emptyHash, one, utility.myMark);
-		Debug.PrintGameState(B);
-		System.out.println(firstHash);
-		System.out.println(firstHash2);
-		System.out.println(ZT.EvaluatedStates.getOrDefault(firstHash, null));
-
-		//Mark second cell
-		B.markCell(two.i, two.j);
-		long secondHash = ZT.computeHash(B);
-		long secondHash2 = ZT.diffHash(firstHash, two, utility.yourMark);
-		Debug.PrintGameState(B);
-		System.out.println(secondHash);
-		System.out.println(secondHash2);
-
-		//Undo second cell
-		B.unmarkCell();
-		secondHash2 = ZT.diffHash(secondHash, two, utility.yourMark);
-		secondHash = ZT.computeHash(B);
-		Debug.PrintGameState(B);
-		System.out.println(secondHash);
-		System.out.println(secondHash2);
-
-		//Undo first cell
-		B.unmarkCell();
-		firstHash = ZT.computeHash(B);
-		Debug.PrintGameState(B);
-		System.out.println(firstHash);
-
-
 
 
 

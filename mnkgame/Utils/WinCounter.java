@@ -1,5 +1,6 @@
 package mnkgame;
 
+import mnkgame.Debug;
 import mnkgame.Utility;
 import mnkgame.Utils.ZobristTableCounters;
 
@@ -19,18 +20,22 @@ public class WinCounter{
     public int P1Score = 0;
     public int P2Score = 0;
 
+	int P1ScoreHash = 0;
+	int P2ScoreHash = 0;
+
     public boolean Full = false;
-	public long StateHash = 0;
+	public Long StateHash = null;
     public LinkedList<MNKCell> CellsToCheck;
 	public Hashtable<String, Integer> CellsIndexes;
 
     //Updates P1 and P2 wins on this counter by analyzing cells controlled by this counter
 	public void updateCounterScore(MNKBoard B, MNKCell lastMove, ZobristTableCounters ZTCounters){
 
-		if(lastMove != null){
+		if(lastMove != null && StateHash != null){
 
 			//Compute new state hash for this counter
-			StateHash = ZTCounters.diffHash(StateHash, lastMove, CellsIndexes.get(Utility.CellIdentifier(lastMove)));
+			MNKCellState targetLastMoveState = B.B[lastMove.i][lastMove.j];
+			StateHash = ZTCounters.diffHash(StateHash, targetLastMoveState, CellsIndexes.get(Utility.CellIdentifier(lastMove)));
 
 			//Check if this state was already computed
 			Integer[] CachedScores = ZTCounters.EvaluatedStates.getOrDefault(StateHash, null);
@@ -39,6 +44,9 @@ public class WinCounter{
 				P2Score = CachedScores[1];
 				return;
 			}
+		}
+		else{
+			StateHash = ZTCounters.computeHash(this, B);
 		}
 
 		//Reset counter values
@@ -93,35 +101,7 @@ public class WinCounter{
 				FreeOrP1_Consecutive++;
 				FreeOrP2_Consecutive++;
 				Free_Consecutive++;
-				P1_Consecutive = 0;
-				P2_Consecutive = 0;
 
-
-//				//Fakely mark this cell to determine if one time victory is possible from this state
-//				if(B.gameState == MNKGameState.OPEN){
-//					B.markCell(cellToCheck.i, cellToCheck.j);
-//					if(B.gameState == MNKGameState.WINP1)
-//						P1_ImmediateWins++;
-//					else if (B.gameState() == MNKGameState.WINP2)
-//						P2_ImmediateWins++;
-//
-//					//Rollback
-//					B.unmarkCell();
-//
-//					//If any of the two players has more than one win with this move, win is certain so return max value
-//					if(P1_ImmediateWins > 1){
-//						mnkgame.Debug.PrintGameState(B);
-//						P1Score = Integer.MAX_VALUE;
-//						P2Score = 0;
-//						return;
-//					}
-//					if(P2_ImmediateWins > 1){
-//						mnkgame.Debug.PrintGameState(B);
-//						P2Score = Integer.MAX_VALUE;
-//						P1Score = 0;
-//						return;
-//					}
-//				}
 			}
 
 
@@ -156,6 +136,10 @@ public class WinCounter{
 			// continue;
 			// }
 		}
+
+		//Finished evaluating counter, save in HashTable for future use
+		Integer[] EvaluatedScores = new Integer[]{ P1Score, P2Score };
+		ZTCounters.EvaluatedStates.put(StateHash, EvaluatedScores);
 
 	}
 
