@@ -1,19 +1,45 @@
 package mnkgame;
 
+import mnkgame.Utility;
+import mnkgame.Utils.ZobristTableCounters;
+
+import javax.swing.plaf.nimbus.State;
 import java.util.*;
+
+
+//TODO: IMPLEMENT REVERSE HASH TO USE SIMMETRY
 
 public class WinCounter{
 
-	public String Name;
+	public WinCounter(){
+		CellsIndexes = new Hashtable<>();
+	}
 
+	public String Name;
     public int P1Score = 0;
     public int P2Score = 0;
 
     public boolean Full = false;
+	public long StateHash = 0;
     public LinkedList<MNKCell> CellsToCheck;
+	public Hashtable<String, Integer> CellsIndexes;
 
     //Updates P1 and P2 wins on this counter by analyzing cells controlled by this counter
-	public void updateCounterScore(MNKBoard B){
+	public void updateCounterScore(MNKBoard B, MNKCell lastMove, ZobristTableCounters ZTCounters){
+
+		if(lastMove != null){
+
+			//Compute new state hash for this counter
+			StateHash = ZTCounters.diffHash(StateHash, lastMove, CellsIndexes.get(Utility.CellIdentifier(lastMove)));
+
+			//Check if this state was already computed
+			Integer[] CachedScores = ZTCounters.EvaluatedStates.getOrDefault(StateHash, null);
+			if(CachedScores != null){
+				P1Score = CachedScores[0];
+				P2Score = CachedScores[1];
+				return;
+			}
+		}
 
 		//Reset counter values
 		P1Score = 0;

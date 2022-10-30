@@ -1,6 +1,10 @@
 package mnkgame;
 
+import mnkgame.Utils.ZobristTableCounters;
+
 import java.util.*;
+
+import static mnkgame.Utility.CellIdentifier;
 
 public class WinCounters {
     
@@ -11,10 +15,15 @@ public class WinCounters {
     public mnkgame.WinCounter[] Counters;
     public ArrayList<ArrayList<LinkedList<Integer>>> WinCountersReferences;
 
+    public ZobristTableCounters ZTCounters;
+
     public WinCounters(){}
 
     public WinCounters(MNKBoard b)
     {
+
+        int Max_M_N = Math.max(b.M, b.N);
+        ZTCounters = new ZobristTableCounters(Max_M_N);
 
         //Calculate how many win counters we need
         int CountersCount = 0;
@@ -31,14 +40,11 @@ public class WinCounters {
 
         //Count diagonal matrixes
         int Min_M_N = Math.min(b.M, b.N);
-        //if(Min_M_N >= b.K){ is not needed?
+        if(b.M >= b.K)
+            CountersCount+= 1+(2*(b.M-b.K));
+        if(b.N >= b.K)
+            CountersCount+= 1+(2*(b.N-b.K));
 
-            if(b.M >= b.K)
-                CountersCount+= 1+(2*(b.M-b.K));
-
-            if(b.N >= b.K)
-                CountersCount+= 1+(2*(b.N-b.K));
-      //  }
 
         //All set
         Counters = new mnkgame.WinCounter[CountersCount];
@@ -73,8 +79,12 @@ public class WinCounters {
 				for(int j = 0; j < b.N; j++){
 
                     //Add reference from this cell to target WinCounter
+                    MNKCell ReferencedCell = new MNKCell(i, j);
                     WinCountersReferences.get(i).get(j).add(CountersIndexPointer);
-                    Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(i, j));
+                    Counters[CountersIndexPointer].CellsToCheck.add(ReferencedCell);
+
+                    //Let the counter know at which index this cell is placed
+                    Counters[CountersIndexPointer].CellsIndexes.put(CellIdentifier(ReferencedCell), j);
                 }
 
                 CountersIndexPointer++;
@@ -97,8 +107,12 @@ public class WinCounters {
 				for(int i = 0; i < b.M; i++){
 
                     //Add reference from this cell to target WinCounter
+                    MNKCell ReferencedCell = new MNKCell(i, j);
                     WinCountersReferences.get(i).get(j).add(CountersIndexPointer);
-                    Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(i, j));
+                    Counters[CountersIndexPointer].CellsToCheck.add(ReferencedCell);
+
+                    //Let the counter know at which index this cell is placed
+                    Counters[CountersIndexPointer].CellsIndexes.put(CellIdentifier(ReferencedCell), i);
                 }
 
                 CountersIndexPointer++;
@@ -141,10 +155,17 @@ public class WinCounters {
                     Counters[CountersIndexPointer] = new mnkgame.WinCounter();
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
+
+                    int index = 0;
                     for(MNKCell c : visited_cells){
+
                         //Add reference from this cell to target WinCounter
+                        MNKCell ReferencedCell = new MNKCell(c.i, c.j);
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
-                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
+                        Counters[CountersIndexPointer].CellsToCheck.add(ReferencedCell);
+
+                        //Let the counter know at which index this cell is placed
+                        Counters[CountersIndexPointer].CellsIndexes.put(CellIdentifier(ReferencedCell), index++);
                     }
 
                     CountersIndexPointer++;
@@ -179,10 +200,17 @@ public class WinCounters {
                     Counters[CountersIndexPointer] = new mnkgame.WinCounter();
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
+
+                    int index = 0;
                     for(MNKCell c : visited_cells){
+
                         //Add reference from this cell to target WinCounter
+                        MNKCell ReferencedCell = new MNKCell(c.i, c.j);
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
-                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
+                        Counters[CountersIndexPointer].CellsToCheck.add(ReferencedCell);
+
+                        //Let the counter know at which index this cell is placed
+                        Counters[CountersIndexPointer].CellsIndexes.put(CellIdentifier(ReferencedCell), index++);
                     }
 
                     CountersIndexPointer++;
@@ -220,10 +248,16 @@ public class WinCounters {
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
 
+                    int index = 0;
                     for(MNKCell c : visited_cells){
+
                         //Add reference from this cell to target WinCounter
+                        MNKCell ReferencedCell = new MNKCell(c.i, c.j);
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
-                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
+                        Counters[CountersIndexPointer].CellsToCheck.add(ReferencedCell);
+
+                        //Let the counter know at which index this cell is placed
+                        Counters[CountersIndexPointer].CellsIndexes.put(CellIdentifier(ReferencedCell), index++);
                     }
 
                     CountersIndexPointer++;
@@ -258,11 +292,17 @@ public class WinCounters {
                     Counters[CountersIndexPointer] = new mnkgame.WinCounter();
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
-                    //System.out.println("\nFrom first column to last row:");
+
+                    int index = 0;
                     for(MNKCell c : visited_cells){
+
                         //Add reference from this cell to target WinCounter
+                        MNKCell ReferencedCell = new MNKCell(c.i, c.j);
                         WinCountersReferences.get(c.i).get(c.j).add(CountersIndexPointer);
-                        Counters[CountersIndexPointer].CellsToCheck.add(new MNKCell(c.i, c.j));
+                        Counters[CountersIndexPointer].CellsToCheck.add(ReferencedCell);
+
+                        //Let the counter know at which index this cell is placed
+                        Counters[CountersIndexPointer].CellsIndexes.put(CellIdentifier(ReferencedCell), index++);
                     }
 
                     CountersIndexPointer++;
@@ -288,7 +328,7 @@ public class WinCounters {
         for(var counter : Counters){
 
             //Keep track of wins on this counter            
-            counter.updateCounterScore(B);
+            counter.updateCounterScore(B, null, ZTCounters);
 
             //Update total wins adding those tracked by this counter
 			TotalP1Score +=counter.P1Score;
@@ -299,7 +339,6 @@ public class WinCounters {
     public LinkedList<Integer> CountersAffectedByMove(MNKCell move){
         return WinCountersReferences.get(move.i).get(move.j);
     }
-
 
 
 }

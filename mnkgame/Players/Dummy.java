@@ -82,7 +82,9 @@ public class Dummy implements MNKPlayer {
 
 		MNKCell one = FC[0];
 		MNKCell two = FC[1];
+
 		//long boardHash = previousHash != null ? ZT.diffHash(previousHash, current, utility.myMark) : ZT.computeHash(B);
+
 		long emptyHash = ZT.computeHash(B);
 		Debug.PrintGameState(B);
 		System.out.println(emptyHash);
@@ -95,8 +97,6 @@ public class Dummy implements MNKPlayer {
 		System.out.println(firstHash);
 		System.out.println(firstHash2);
 		System.out.println(ZT.EvaluatedStates.getOrDefault(firstHash, null));
-		ZT.EvaluatedStates.put(firstHash, 1);
-		System.out.println(ZT.EvaluatedStates.get(firstHash));
 
 		//Mark second cell
 		B.markCell(two.i, two.j);
@@ -108,10 +108,11 @@ public class Dummy implements MNKPlayer {
 
 		//Undo second cell
 		B.unmarkCell();
+		secondHash2 = ZT.diffHash(secondHash, two, utility.yourMark);
 		secondHash = ZT.computeHash(B);
 		Debug.PrintGameState(B);
 		System.out.println(secondHash);
-
+		System.out.println(secondHash2);
 
 		//Undo first cell
 		B.unmarkCell();

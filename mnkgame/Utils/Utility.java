@@ -126,7 +126,7 @@ public class Utility {
 			counters.TotalP2Score -=counters.Counters[index].P2Score;
 
 			//Now effectively search for new wins on this counter
-			counters.Counters[index].updateCounterScore(B);
+			counters.Counters[index].updateCounterScore(B, lastMove, counters.ZTCounters);
 
 			//Update total wins on board after this move
 			counters.TotalP1Score +=counters.Counters[index].P1Score;
@@ -218,5 +218,9 @@ public class Utility {
 		boolean Expiring = (System.currentTimeMillis() - timerStart) / 1000.0 > TIMEOUT
 				* (TRIGGER_TIMEOUT_PERCENTAGE / 100.0);
 		return Expiring;
+	}
+
+	public static String CellIdentifier(MNKCell cell){
+		return cell.i + "," + cell.j;
 	}
 }

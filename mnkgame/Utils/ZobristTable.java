@@ -157,16 +157,4 @@ public class ZobristTable {
         else
             return -1;
     }
-
-    // Used only by diffHash, if placed cell for P1 then is turn of P2 and vice-versa
-    private int turnId(MNKCellState state) {
-        if (state == MNKCellState.P1)
-            return 1;
-        else if (state == MNKCellState.P2)
-            return 0;
-        else
-            return -1;
-    }
-
-
 }
