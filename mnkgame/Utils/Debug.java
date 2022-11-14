@@ -8,6 +8,7 @@ public class Debug {
     public static boolean active = true;
     public static long TotalEvaluations = 0;
     public static long Cuts = 0;
+    public static long TableRead = 0;
     public static long MaxDepthReached = 0;
     public static boolean SolvedGame = true;
     public static int AlgorithmStarts = 0;
@@ -41,6 +42,7 @@ public class Debug {
         TotalEvaluations = 0;
         MaxDepthReached = 0;
         Cuts = 0;
+        TableRead = 0;
         if(!SolvedGame)
             AlgorithmStarts++;
         SolvedGame = true;
@@ -65,6 +67,7 @@ public class Debug {
         System.out.println("\n---------RESULT---------");
         System.out.println("Evaluations: " + TotalEvaluations);
         System.out.println("Cuts: " + Cuts);
+        System.out.println("TableRead: " + TableRead);
         System.out.println("Max depth reached: " + MaxDepthReached);
 
 
@@ -131,6 +134,6 @@ public class Debug {
         if(!active)
             return;
 
-        Cuts++;
+        TableRead++;
     }
 }
