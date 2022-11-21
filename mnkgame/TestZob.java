@@ -351,7 +351,8 @@ public class TestZob implements MNKPlayer {
 
 	public void SaveState(Long hash, MNKBoard b, int evaluation){
 
-		if(hash == null || Math.abs(evaluation) < (Integer.MAX_VALUE-50))
+        //Save for future use only if state is certain (not middle evaluations)
+		if(hash == null || Math.abs(evaluation) < (Integer.MAX_VALUE-50)) 
 			return;
 
 		//Add current value to HashSet for future use

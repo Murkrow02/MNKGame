@@ -1,0 +1,199 @@
+
+3 3 3
+
+mnkgame.TestZob first 
+
+TestZob Score: 1 Won: 0 Lost: 0 Draw: 1 Error: 0
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+BottargaPlayer-MoveOrder Score: 1 Won: 0 Lost: 0 Draw: 1 Error: 0
+
+4 3 3
+
+mnkgame.TestZob first 
+
+TestZob Score: 2 Won: 1 Lost: 0 Draw: 0 Error: 0
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+BottargaPlayer-MoveOrder Score: 2 Won: 1 Lost: 0 Draw: 0 Error: 0
+
+4 4 3
+
+mnkgame.TestZob first 
+
+TestZob Score: 2 Won: 1 Lost: 0 Draw: 0 Error: 0
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+BottargaPlayer-MoveOrder Score: 2 Won: 1 Lost: 0 Draw: 0 Error: 0
+
+4 4 4
+
+mnkgame.TestZob first 
+
+TestZob Score: 1 Won: 0 Lost: 0 Draw: 1 Error: 0
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+5 4 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+5 5 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+6 4 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+6 5 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+6 6 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+6 6 5
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+6 6 6
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 4 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 5 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 6 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 7 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 5 5
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 6 5
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 7 5
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 7 6
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+7 7 7
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+8 8 4
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+10 10 5
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+50 50 10
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
+
+70 70 10
+
+mnkgame.TestZob first 
+
+
+BottargaPlayer.PlayerMoveOrder.Player first 
+
