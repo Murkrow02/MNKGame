@@ -5,7 +5,7 @@ import mnkgame.*;
 public class Debug {
 
     //Enable-disable debug logs
-    public static boolean active = true;
+    public static boolean active = false;
     public static long TotalEvaluations = 0;
     public static long Cuts = 0;
     public static long TableRead = 0;
