@@ -50,8 +50,10 @@ public class Utility {
 			return MAX_VALUE;
 		else if (B.gameState() == yourWin)
 			return -MAX_VALUE; //Worst case
+		else if (B.gameState() == MNKGameState.DRAW)
+			return 0; //Neutral
 
-		//Evaluate intermediate states
+		//Evaluate open states
 
 		//P1 is winning
 		if(counters.TotalP1Score > 0 && counters.TotalP2Score <= 0){

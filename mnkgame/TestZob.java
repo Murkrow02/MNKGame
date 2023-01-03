@@ -85,7 +85,7 @@ public class TestZob implements MNKPlayer {
         if (MC.length > 0) {
             MNKCell c = MC[MC.length - 1]; // Recover move from opponent
             B.markCell(c.i, c.j);         // Save the last move in the local MNKBoard
-            utility.updateWinCounters(B, Counters, c);
+            utility.updateWinCounters(B, Counters, c); //Update wincounters with opponent move
         }
 
         // If there is just one possible move, return immediately (match is over)
@@ -206,7 +206,7 @@ public class TestZob implements MNKPlayer {
             //got only leaf states from this
             //initially true, becomes false when a node returns false to the isLeaf property
             //
-            //NOTE: the root node is considered as squeezed if an alpha-beta cut on a non-heuristic evaluation is made
+            //NOTE: the root node is considered as squeezed if an alpha-beta cut or a non-heuristic evaluation is made
             boolean SqueezedNode = true;
 
             //Cycle through all possible moves

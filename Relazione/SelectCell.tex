@@ -1,0 +1,72 @@
+\title{SelectCell}
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage{fancyhdr,graphicx,amsmath,amssymb}
+\usepackage[ruled,vlined]{algorithm2e}
+\include{pythonlisting}
+\begin{document} 
+\begin{algorithm}
+\SetAlgoLined
+maxDepth=1\;
+bestMove = null\;
+bestVal = -\infty ; \; \\
+ \While{!timeOut}{
+ 
+    bestIterationMove = null \;
+    \State bestIterationVal = -\infty ; \; \\
+    \For{c in FreeCells}{
+        marca cella c\;
+        aggiorna WinCounters(c)\;
+        moveVal = MiniMax(maxDepth)\;
+        resetta WinCounters(c)\;
+        undo marca cella c\;
+
+        \If{moveVal \>> bestIterationVal}{
+            bestIterationMove = c\;
+        }
+    }
+
+    \If{iterazione finita prima del timeout}{
+    //Assumiamo che a profondita' maggiore, questa valutazione sia piu' accurata\\
+    //anche se ha valore minore della precedente bestMove\\
+            bestMove = bestIterationMove;\
+        }
+    
+  
+   maxDepth++\;
+ }
+return BestMove
+\caption{SelectCell}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+
+\If{gioco finito}{
+//Solo se vittoria, sconfitta o pareggio \\
+            return valuta(B)\;
+}
+
+\If{tempo\ sta\ per\ scadere \lor \ depth\leq0 }{
+	return valutazioneParziale(B)\;
+}
+
+\If{maximizing}{
+
+	
+	squeezedNode = true\;
+	
+	 \For{c in FreeCells}{
+         marca cella c\;
+        aggiorna WinCounters(c)\;
+        moveVal = MiniMax(maxDepth)\;
+        resetta WinCounters(c)\;
+        undo marca cella c\;
+    }
+}
+
+ \caption{MiniMax}
+\end{algorithm}
+
+\end{document}
