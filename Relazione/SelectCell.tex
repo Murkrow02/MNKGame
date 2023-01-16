@@ -22,7 +22,7 @@ bestVal = -\infty ; \; \\
         resetta WinCounters(c)\;
         undo marca cella c\;
 
-        \If{moveVal \>> bestIterationVal}{
+        \If{moveVal $>$ bestIterationVal}{
             bestIterationMove = c\;
         }
     }
@@ -39,34 +39,4 @@ bestVal = -\infty ; \; \\
 return BestMove
 \caption{SelectCell}
 \end{algorithm}
-
-\begin{algorithm}[H]
-\SetAlgoLined
-
-\If{gioco finito}{
-//Solo se vittoria, sconfitta o pareggio \\
-            return valuta(B)\;
-}
-
-\If{tempo\ sta\ per\ scadere \lor \ depth\leq0 }{
-	return valutazioneParziale(B)\;
-}
-
-\If{maximizing}{
-
-	
-	squeezedNode = true\;
-	
-	 \For{c in FreeCells}{
-         marca cella c\;
-        aggiorna WinCounters(c)\;
-        moveVal = MiniMax(maxDepth)\;
-        resetta WinCounters(c)\;
-        undo marca cella c\;
-    }
-}
-
- \caption{MiniMax}
-\end{algorithm}
-
 \end{document}
