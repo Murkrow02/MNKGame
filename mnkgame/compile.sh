@@ -1,1 +1,2 @@
-javac -d out */*.java *.java
+find -name "*.java" > sources.txt
+javac -d out @sources.txt
