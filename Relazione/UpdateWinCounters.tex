@@ -1,0 +1,80 @@
+\title{UpdateWinCounters}
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage{fancyhdr,graphicx,amsmath,amssymb}
+\usepackage[ruled,vlined]{algorithm2e}
+\include{pythonlisting}
+\begin{document} 
+\begin{algorithm}
+\SetAlgoLined
+
+// Resetta il punteggio di questo WinCounter\\
+P1Score = 0\;
+P2Score = 0\;
+//Inizializza i parametri di valutazione\\
+FreeOrP1Consecutive = 0\;
+FreeOrP2Consecutive = 0\;
+P1Consecutive = 0\;
+P2Consecutive = 0\;
+
+//Controlla tutte le celle controllate da questo WinCounter\\ 
+\For{c in CellsToCheck}{
+
+	// Chi controlla questa cella\\
+	targetCellState = B[c.i][c.j]\;
+
+	\If{targetCellState == P1}{
+    
+    	//Controlla P1, resetta la streak di P2 e incrementa la streak di P1\\
+    	FreeOrP2Consecutive = 0\;
+		P2Consecutive = 0\;
+
+		P1Consecutive++\;
+		FreeOrP1Consecutive++\;
+    }\ElseIf{targetCellState == P2}
+    {
+    	//Controlla P2, resetta la streak di P1 e incrementa la streak di P2\\
+    	FreeOrP1Consecutive = 0\;
+		P1Consecutive = 0\;
+
+		P2Consecutive++\;
+		FreeOrP2Consecutive++\;
+    }
+    \Else{
+    	// Cella libera\\
+    	FreeOrP1Consecutive++\;
+		FreeOrP2Consecutive++\;
+    }
+    
+    
+    //Valutazioni\\
+    
+    \If {$FreeOrP1Consecutive \geq B.K$} {
+
+		//Piu probabilita' di vittoria per ogni segno consecutivo\\
+		P1Score += Math.pow(10,P1Consecutive)\;
+
+		//Resetta streaks\\
+		P1Consecutive = 0\; 
+		FreeOrP1Consecutive = 0\;
+	
+	}
+	
+	\If {$FreeOrP2Consecutive \geq B.K$} {
+
+		//Piu probabilita' di vittoria per ogni segno consecutivo\\
+		P2Score += Math.pow(10,P2Consecutive)\;
+
+		//Resetta streaks\\
+		P2Consecutive = 0\; 
+		FreeOrP2Consecutive = 0\;
+	
+	}
+    
+}
+
+
+\caption{UpdateWinCounters}
+\end{algorithm}
+\end{document}
