@@ -340,7 +340,7 @@ public class TestZob implements MNKPlayer {
 	}
 
     public String playerName() {
-        return "TestZob";
+        return "Mettaton";
     }
 }
 

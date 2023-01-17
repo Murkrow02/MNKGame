@@ -97,6 +97,9 @@ public class TestZob implements MNKPlayer {
         //Use the first available cell if something goes wrong
         MNKCell BestMove = FC[0];
 
+        //DEBUG
+        mnkgame.Debug.Reset();
+
         /*CANNOT IMMEDIATELY WIN, PROCEED WITH MINIMAX*/
 
         //Iterative deep, increase depth each time until timeout
@@ -136,6 +139,9 @@ public class TestZob implements MNKPlayer {
                     ExploredWholeTree = false;
                 }
 
+                //DEBUG
+                mnkgame.Debug.PrintMiddleCicle(B, d, MoveVal.BoardValue);
+
                 //Rollback
                 utility.updateWinCounters(B, Counters, d);
                 B.unmarkCell();
@@ -159,6 +165,9 @@ public class TestZob implements MNKPlayer {
             if (FinishedIteration)
                 BestMove = BestIterationMove;
 
+            //Just went deeper!
+            mnkgame.Debug.NewDepthReached();
+
             //Stop immediately iteration deepening if we explored the whole game tree
             if (ExploredWholeTree)
                 break;
@@ -168,12 +177,18 @@ public class TestZob implements MNKPlayer {
         B.markCell(BestMove.i, BestMove.j); //Update local board with this move
         utility.updateWinCounters(B, Counters, BestMove);
 
+        //DEBUG
+        mnkgame.Debug.PrintSummary();
+        mnkgame.Debug.PrintCounters(Counters);
+
         //Update game UI
         return BestMove;
     }
 
     public mnkgame.MiniMaxState miniMax(boolean maximizingPlayer, int alpha, int beta, Long nodeHash, int depth, MNKCell nodeMove) {
 
+        //DEBUG
+        //mnkgame.Debug.PrintGameState(B);
 
         //Base case, evaluation detected gameover or timeout soon
         if (B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0) {
@@ -227,6 +242,8 @@ public class TestZob implements MNKPlayer {
 
                     //Restore wincounters before this move
                     utility.updateWinCounters(B, Counters, current);
+                }else{
+                    mnkgame.Debug.AlreadyEvaluated();
                 }
 
                 //Undo the move
@@ -239,6 +256,8 @@ public class TestZob implements MNKPlayer {
                 //Prune if better result was available before, no need to continue searching
                 alpha = Math.max(alpha, MaxValue);
                 if (alpha >= beta) {
+
+                    mnkgame.Debug.Cuts++;
 
                     //Consider an alpha-beta cut as a leaf state only if the cut
                     //was not on a heuristic node, but on an end-game node
@@ -297,6 +316,9 @@ public class TestZob implements MNKPlayer {
 					//Restore wincounters before this move
 					utility.updateWinCounters(B, Counters, current);
 				}
+                else{
+                    mnkgame.Debug.AlreadyEvaluated();
+                }
 
                 //Undo the move
                 B.unmarkCell();
@@ -308,6 +330,7 @@ public class TestZob implements MNKPlayer {
                 //Prune if better result was available before, no need to continue searching
                 beta = Math.min(beta, MinValue);
                 if (beta <= alpha) {
+                    mnkgame.Debug.Cuts++;
 
                     //Consider an alpha-beta cut as a leaf state only if the cut
                     //was not on a heuristic node, but on an end-game node

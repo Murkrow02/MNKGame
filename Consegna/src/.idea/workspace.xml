@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="f5272e74-590b-4d08-a94e-97c210c8baeb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.Player.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.Player.txt.dirty" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/TestZob.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/TestZob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/Utils/WinCounters.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/Utils/WinCounters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/compile.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/compile.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/TestZob.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/TestZob.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/WinCounters.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/WinCounters.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectId" id="2KRzc2fbIKb7P0AIjHebhPYkIlM" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f5272e74-590b-4d08-a94e-97c210c8baeb" name="Changes" comment="" />
+      <created>1673952258974</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1673952258974</updated>
+      <workItem from="1673952261067" duration="6000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
