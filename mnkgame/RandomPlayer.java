@@ -22,23 +22,53 @@
 
 package mnkgame;
 
+import java.util.Random;
+
 /**
- * <code>MNKBoard</code> cell states
- *
- * @see MNKCell MNKCell
- * @see MNKBoard MNKBoard
+ * Totally random software player.
  */
-public enum MNKCellState {
+public class RandomPlayer  implements MNKPlayer {
+	private Random rand;
+	private int TIMEOUT;
+
 	/**
-   * Cell selected by Player 1
+   * Default empty constructor
    */
-	P1,    
+	public RandomPlayer() {
+	}
+
+	public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
+		// New random seed for each game
+		rand    = new Random(System.currentTimeMillis()); 
+		// Save the timeout for testing purposes
+		TIMEOUT = timeout_in_secs;
+		
+		// Uncomment to chech the initialization timeout
+		/* 
+		try {
+			Thread.sleep(1000*2*TIMEOUT);
+		} 
+		catch(Exception e) {
+		}
+		*/
+	}
+
 	/**
-	 * Cell selected by Player 2
-	 */
-	P2,
-	/**
-   * Free cell
+   * Selects a random cell in <code>FC</code>
    */
-  FREE	
+	public MNKCell selectCell(MNKCell[] FC, MNKCell[] MC) {
+		// Uncomment to chech the move timeout
+		/* 
+		try {
+			Thread.sleep(1000*2*TIMEOUT);
+		} 
+		catch(Exception e) {
+		}
+		*/
+		return FC[rand.nextInt(FC.length)];
+	}
+
+	public String playerName() {
+		return "R4nd0m";
+	}
 }

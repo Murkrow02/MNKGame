@@ -48,7 +48,7 @@ public class ZobristTableCounters {
         List<MNKCell> CellsToCheck = counter.CellsToCheck;
         int index = 0;
         for (MNKCell current : CellsToCheck) {
-            hash ^= ZT[index++][stateId(b.B[current.i][current.j])];// Bitwise XOR
+            hash ^= ZT[index++][stateId(b.cellState(current.i,current.j))];// Bitwise XOR
         }
 
         return hash;

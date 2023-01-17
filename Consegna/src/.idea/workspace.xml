@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="f5272e74-590b-4d08-a94e-97c210c8baeb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utils/ZobristTableCounters.java" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/ZobristTableCounters.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.Player.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.Player.txt.dirty" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mnkgame/Logs/mnkgame.TestZobVSBottargaPlayer.PlayerMoveOrder.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mnkgame/TestZob.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/TestZob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mnkgame/Utils/WinCounters.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/Utils/WinCounters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mnkgame/compile.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/compile.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/TestZob.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/TestZob.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/WinCounters.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/WinCounters.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/MNKBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/MNKBoard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/MNKCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/MNKCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/MNKCellState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/MNKCellState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/MNKGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/MNKGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/MNKGameState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/MNKGameState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/MNKPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/MNKPlayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/MNKPlayerTester.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/MNKPlayerTester.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/MNKBoard.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/MNKBoard.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/MNKGame$MNKMouseAdapter.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../mnkgame/out/mnkgame/MNKGame$MNKMouseAdapter.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +25,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2KRzc2fbIKb7P0AIjHebhPYkIlM" />
   <component name="ProjectViewState">
@@ -29,6 +39,10 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -41,6 +55,7 @@
       <option name="presentableId" value="Default" />
       <updated>1673952258974</updated>
       <workItem from="1673952261067" duration="6000" />
+      <workItem from="1673968864922" duration="1049000" />
     </task>
     <servers />
   </component>
