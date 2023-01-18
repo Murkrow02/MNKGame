@@ -1,30 +1,22 @@
-package mnkgame.Utils;
+package mnkgame.utils;
+import mnkgame.*;
+import java.util.*;
 
-import mnkgame.Debug;
-import mnkgame.MNKBoard;
-import mnkgame.MNKCell;
-import mnkgame.WinCounter;
+import static mnkgame.utils.Utility.CellIdentifier;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import static mnkgame.Utility.CellIdentifier;
-
-public class WinCountersDebug {
-
+public class WinCounters {
+    
     //Save here total wins to prevent cicling each time on array to get exact scores
     public int TotalP1Score = 0;
     public int TotalP2Score = 0;
-
     public WinCounter[] Counters;
     public ArrayList<ArrayList<LinkedList<Integer>>> WinCountersReferences;
 
     public ZobristTableCounters ZTCounters;
 
-    public WinCountersDebug(){}
+    public WinCounters(){}
 
-    public WinCountersDebug(MNKBoard b)
+    public WinCounters(MNKBoard b)
     {
 
         int Max_M_N = Math.max(b.M, b.N);
@@ -318,9 +310,6 @@ public class WinCountersDebug {
                 //Restore i that was modified in the while loop
                 i = old_i;
             }
-
-            Debug.PrintDiagonalsCount(totalDiagonals);
-            Debug.PrintCountersCount(CountersCount);
         }
     }
 

@@ -1,18 +1,15 @@
-package mnkgame;
-
-import mnkgame.Utils.ZobristTableCounters;
-
+package mnkgame.utils;
+import mnkgame.*;
 import java.util.*;
 
-import static mnkgame.Utility.CellIdentifier;
+import static mnkgame.utils.Utility.CellIdentifier;
 
 public class WinCounters {
     
     //Save here total wins to prevent cicling each time on array to get exact scores
     public int TotalP1Score = 0;
     public int TotalP2Score = 0;
-
-    public mnkgame.WinCounter[] Counters;
+    public WinCounter[] Counters;
     public ArrayList<ArrayList<LinkedList<Integer>>> WinCountersReferences;
 
     public ZobristTableCounters ZTCounters;
@@ -47,7 +44,7 @@ public class WinCounters {
 
 
         //All set
-        Counters = new mnkgame.WinCounter[CountersCount];
+        Counters = new WinCounter[CountersCount];
         WinCountersReferences = new ArrayList<>(b.M);
 
         //Initialize lists for board cell references (used to immediately access matrixes to edit when a new piece is added)
@@ -71,7 +68,7 @@ public class WinCounters {
             for(int i = 0; i < b.M; i++){
 
                 //Add a new counter
-                Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                Counters[CountersIndexPointer] = new WinCounter();
                 Counters[CountersIndexPointer].Name = "Row " + i;
                 Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
                 
@@ -99,7 +96,7 @@ public class WinCounters {
             for(int j = 0; j < b.N; j++){
 
                 //Add a new counter
-                Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                Counters[CountersIndexPointer] = new WinCounter();
                 Counters[CountersIndexPointer].Name = "Column " + j;
                 Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
                 
@@ -152,7 +149,7 @@ public class WinCounters {
                 if(enough_space){
 
                     //Add a new counter
-                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                    Counters[CountersIndexPointer] = new WinCounter();
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
 
@@ -197,7 +194,7 @@ public class WinCounters {
                 if(enough_space){
 
                     //Add a new counter
-                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                    Counters[CountersIndexPointer] = new WinCounter();
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
 
@@ -244,7 +241,7 @@ public class WinCounters {
                 if(enough_space){
 
                     //Add a new counter
-                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                    Counters[CountersIndexPointer] = new WinCounter();
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
 
@@ -289,7 +286,7 @@ public class WinCounters {
                 if(enough_space){
 
                     //Add a new counter
-                    Counters[CountersIndexPointer] = new mnkgame.WinCounter();
+                    Counters[CountersIndexPointer] = new WinCounter();
                     Counters[CountersIndexPointer].Name = "Diagonal from " + visited_cells.get(0).i + " " + visited_cells.get(0).j;
                     Counters[CountersIndexPointer].CellsToCheck = new LinkedList<MNKCell>();
 

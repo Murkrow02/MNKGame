@@ -1,14 +1,7 @@
-package mnkgame;
-
-import mnkgame.Debug;
-import mnkgame.Utility;
-import mnkgame.Utils.ZobristTableCounters;
-
-import javax.swing.plaf.nimbus.State;
+package mnkgame.utils;
+import mnkgame.*;
 import java.util.*;
 
-
-//TODO: IMPLEMENT REVERSE HASH TO USE SIMMETRY
 
 public class WinCounter{
 
@@ -34,7 +27,7 @@ public class WinCounter{
 		if(lastMove != null && StateHash != null){
 
 			//Compute new state hash for this counter
-			MNKCellState targetLastMoveState = B.B[lastMove.i][lastMove.j];
+			MNKCellState targetLastMoveState = B.cellState(lastMove.i,lastMove.j);
 			StateHash = ZTCounters.diffHash(StateHash, targetLastMoveState, CellsIndexes.get(Utility.CellIdentifier(lastMove)));
 
 			//Check if this state was already computed
@@ -70,7 +63,7 @@ public class WinCounter{
 		for (var cellToCheck : CellsToCheck) {
 
 			//Check current cell marked state
-			MNKCellState targetCellState = B.B[cellToCheck.i][cellToCheck.j];
+			MNKCellState targetCellState = B.cellState(cellToCheck.i,cellToCheck.j);
 
 			//P1 controls this cell
 			if (targetCellState == MNKCellState.P1){

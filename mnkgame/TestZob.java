@@ -1,6 +1,7 @@
 package mnkgame;
 
 import java.util.Hashtable;
+import mnkgame.utils.*;
 
 /*
  * TODO: Insert all possible win/loss already in hash table
@@ -12,15 +13,15 @@ import java.util.Hashtable;
 public class TestZob implements MNKPlayer {
 
     private MNKBoard B;
-    private mnkgame.Utility utility;
+    private Utility utility;
 
     /* This tri-dimensional array stores M*N random values, is used
        by the game board hashing function to create a unique hash of
        each possible game state
     */
-    public mnkgame.ZobristTable ZT;
+    public ZobristTable ZT;
 
-    public mnkgame.WinCounters Counters;
+    public WinCounters Counters;
 
     /*
      * Count how many times the iteration deepening reached a leaf state
@@ -36,7 +37,7 @@ public class TestZob implements MNKPlayer {
 
     public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
 
-        utility = new mnkgame.Utility();
+        utility = new Utility();
 
         //LOCAL BOARD
         B = new MNKBoard(M, N, K);
@@ -56,7 +57,7 @@ public class TestZob implements MNKPlayer {
         utility.yourMark = utility.meFirst ? MNKCellState.P2 : MNKCellState.P1;
 
         //Initialize Zobrist table
-        ZT = new mnkgame.ZobristTable(M, N);
+        ZT = new ZobristTable(M, N);
 
         //Initialize hash table
         int MaxTableSize = 1 << 20; // 2^20
@@ -70,7 +71,7 @@ public class TestZob implements MNKPlayer {
         ZT.EvaluatedStates = new Hashtable<Long, Integer>(TableSize);
 
         //Initialize wincounters and respective cell references
-        Counters = new mnkgame.WinCounters(B);
+        Counters = new WinCounters(B);
 
         //First scan of the whole board, foreach WinCounter check how many wins player can reach
         Counters.UpdateAllCounters(B);
@@ -128,7 +129,7 @@ public class TestZob implements MNKPlayer {
                 utility.updateWinCounters(B, Counters, d);
 
                 //Apply minimax algorithm on the cell
-                mnkgame.MiniMaxState MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
+                MiniMaxState MoveVal = miniMax(false, Integer.MIN_VALUE, Integer.MAX_VALUE, null, i, d);
                 CellExaminedCount++;
 
                 //
@@ -172,13 +173,13 @@ public class TestZob implements MNKPlayer {
         return BestMove;
     }
 
-    public mnkgame.MiniMaxState miniMax(boolean maximizingPlayer, int alpha, int beta, Long nodeHash, int depth, MNKCell nodeMove) {
+    public MiniMaxState miniMax(boolean maximizingPlayer, int alpha, int beta, Long nodeHash, int depth, MNKCell nodeMove) {
 
 
         //Base case, evaluation detected gameover or timeout soon
         if (B.gameState() != MNKGameState.OPEN || utility.isTimeExpiring() || depth <= 0) {
             //In return object, save evaluation value and true if reached leaf, false otherwise
-            return new mnkgame.MiniMaxState(utility.evaluateBoard2(B, Counters, depth), B.gameState() != MNKGameState.OPEN);
+            return new MiniMaxState(utility.evaluateBoard2(B, Counters, depth), B.gameState() != MNKGameState.OPEN);
         }
 
         //Our turn (Maximizing)
@@ -213,7 +214,7 @@ public class TestZob implements MNKPlayer {
 
                     //Recursively call minmax on this board scenario
                     int d = depth - 1;
-                    mnkgame.MiniMaxState eval = miniMax(false, alpha, beta, boardHash, d, current);
+                    MiniMaxState eval = miniMax(false, alpha, beta, boardHash, d, current);
                     boardValue = eval.BoardValue;
 
                     //Check if we squeezed all children of current node
@@ -243,7 +244,7 @@ public class TestZob implements MNKPlayer {
                     //Consider an alpha-beta cut as a leaf state only if the cut
                     //was not on a heuristic node, but on an end-game node
                     //boolean squeezedByAlphaBeta = Math.abs(MaxValue) > (Integer.MAX_VALUE-50);
-                    return new mnkgame.MiniMaxState(MaxValue, true);
+                    return new MiniMaxState(MaxValue, true);
                 }
             }
 
@@ -252,7 +253,7 @@ public class TestZob implements MNKPlayer {
 				SaveState(nodeHash, B, MaxValue);
 
             //Return the best value obtained
-            return new mnkgame.MiniMaxState(MaxValue, SqueezedNode);
+            return new MiniMaxState(MaxValue, SqueezedNode);
         }
         //Opponent turn (minimizing)
         else {
@@ -282,7 +283,7 @@ public class TestZob implements MNKPlayer {
 
 					//Recursively call minmax on this board scenario
 					int d = depth - 1;
-					mnkgame.MiniMaxState eval = miniMax(true, alpha, beta, boardHash, d, current);
+					MiniMaxState eval = miniMax(true, alpha, beta, boardHash, d, current);
 					boardValue = eval.BoardValue;
 
 					//Check if we squeezed all children of current node
@@ -312,7 +313,7 @@ public class TestZob implements MNKPlayer {
                     //Consider an alpha-beta cut as a leaf state only if the cut
                     //was not on a heuristic node, but on an end-game node
                     //boolean squeezedByAlphaBeta = Math.abs(MinValue) > (Integer.MAX_VALUE-50);
-                    return new mnkgame.MiniMaxState(MinValue, true);
+                    return new MiniMaxState(MinValue, true);
                 }
             }
 
@@ -320,7 +321,7 @@ public class TestZob implements MNKPlayer {
 			if(SqueezedNode)
 				SaveState(nodeHash, B, MinValue);
 
-            return new mnkgame.MiniMaxState(MinValue, SqueezedNode);
+            return new MiniMaxState(MinValue, SqueezedNode);
         }
 
 

@@ -1,4 +1,4 @@
-package mnkgame;
+package mnkgame.utils;
 
 import mnkgame.*;
 
@@ -22,9 +22,9 @@ public class Debug {
 		for (int i = 0; i < b.M; i++) { // Print gameboard
 			for (int j = 0; j < b.N; j++) {
                 String mark = "-";
-                if(b.B[i][j] == MNKCellState.P1)
+                if(b.cellState(i,j) == MNKCellState.P1)
                     mark = "X";
-                else if (b.B[i][j] == MNKCellState.P2)
+                else if (b.cellState(i,j) == MNKCellState.P2)
                     mark = "O";
 				System.out.print(mark + "\t");
 			}
@@ -77,12 +77,12 @@ public class Debug {
 //        }
     }
 
-    public static void PrintCounters(mnkgame.WinCounters counters){
+    public static void PrintCounters(WinCounters counters){
 
         if(!active)
             return;
         System.out.println("\n---------WINCOUNTERS---------");
-        for (mnkgame.WinCounter counter : counters.Counters){
+        for (WinCounter counter : counters.Counters){
             System.out.println(counter.Name + " P1: " + counter.P1Score + " P2: " + counter.P2Score);
 //            for(MNKCell controlled : counter.CellsToCheck){
 //                System.out.println(controlled.toString());
@@ -108,7 +108,7 @@ public class Debug {
         if(!active)
             return;
 
-        mnkgame.Debug.IncreaseEvaluations();
+        Debug.IncreaseEvaluations();
 
         System.out.println(cell.i + "," + cell.j + ": " + val);
     }

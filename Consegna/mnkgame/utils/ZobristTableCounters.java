@@ -1,9 +1,5 @@
-package mnkgame.Utils;
-
-import mnkgame.MNKBoard;
-import mnkgame.MNKCell;
-import mnkgame.MNKCellState;
-import mnkgame.WinCounter;
+package mnkgame.utils;
+import mnkgame.*;
 
 import java.util.Hashtable;
 import java.util.List;

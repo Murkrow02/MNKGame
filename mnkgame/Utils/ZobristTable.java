@@ -1,12 +1,8 @@
-package mnkgame;
+package mnkgame.utils;
+import mnkgame.*;
 
 import java.util.Hashtable;
 import java.util.Random;
-import mnkgame.MNKBoard;
-import mnkgame.Utility;
-import mnkgame.CustomMNKBoard;
-import mnkgame.MNKCell;
-import mnkgame.MNKCellState;
 
 public class ZobristTable {
     
@@ -88,7 +84,7 @@ public class ZobristTable {
         int middleRow = b.M/2;
 
 		//Cycle through already marked cells
-		for(MNKCell c : b.MC) {
+		for(MNKCell c : b.getMarkedCells()) {
 			
             //Only square board rotations
             if(b.N == b.M){
