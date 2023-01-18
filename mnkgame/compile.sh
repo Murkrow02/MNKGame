@@ -1,1 +1,1 @@
-javac -d out *.java Utils/*.java
+javac -cp ".." -d out *.java

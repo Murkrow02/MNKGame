@@ -43,7 +43,7 @@ BottargaPlayer-MoveOrder Score: 2 Won: 0 Lost: 0 Draw: 2 Error: 0
 
 mnkgame.TestZob first 
 
-TestZob Score: 3 Won: 1 Lost: 0 Draw: 1 Error: 0
+TestZob Score: 4 Won: 2 Lost: 0 Draw: 0 Error: 0
 
 BottargaPlayer.PlayerMoveOrder.Player first 
 
@@ -57,27 +57,22 @@ TestZob Score: 2 Won: 0 Lost: 0 Draw: 2 Error: 0
 
 BottargaPlayer.PlayerMoveOrder.Player first 
 
-BottargaPlayer-MoveOrder Score: 2 Won: 0 Lost: 0 Draw: 2 Error: 0
 
 6 4 4
 
 mnkgame.TestZob first 
 
-TestZob Score: 2 Won: 0 Lost: 0 Draw: 2 Error: 0
 
 BottargaPlayer.PlayerMoveOrder.Player first 
 
-BottargaPlayer-MoveOrder Score: 2 Won: 0 Lost: 0 Draw: 2 Error: 0
 
 6 5 4
 
 mnkgame.TestZob first 
 
-TestZob Score: 4 Won: 2 Lost: 0 Draw: 0 Error: 0
 
 BottargaPlayer.PlayerMoveOrder.Player first 
 
-BottargaPlayer-MoveOrder Score: 4 Won: 2 Lost: 0 Draw: 0 Error: 0
 
 6 6 4
 
